@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#111419">
   <meta name="description" content="A visual emergency lighting pattern sequencer for S&box.">
-  <title>ELS Studio | Pattern Editor</title>
+  <title>ELS Studio | Advanced Pattern Editor</title>
   <style>
     :root {
       --bg: #0f1216; --surface: #161a1f; --surface-2: #1c2229; --surface-3: #262d35;
@@ -124,6 +124,79 @@
     @media(max-width:740px) { .topbar { height:auto; padding:13px 15px; flex-wrap:wrap } .workspace { display:block } .sidebar { border-right:0; border-bottom:1px solid var(--border); padding:17px; display:grid; grid-template-columns:1fr 1fr; gap:17px } .sidebar-foot { grid-column:1/-1; margin-top:0 } .main { padding:19px 12px 30px } .preview-body { padding:14px 12px } .panel-header,.editor-controls,.presetbar { padding:12px } .saved { display:none } :root { --label-width:155px } .timeline { padding:7px } .heading.first,.row-label { left:7px } .lamp { min-width:42px; height:29px; flex-basis:47px } }
     @media(max-width:450px) { .sidebar { grid-template-columns:1fr } .sidebar-foot { grid-column:1 } .brand-sub { display:none } .top-actions { width:100% } .meta { gap:10px } .panel-side { gap:6px } }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; scroll-behavior:auto!important } }
+
+    /* v0.3: hardware, workspace, and readability improvements */
+    .btn-group {display:flex; gap:7px; flex-wrap:wrap; align-items:center}
+    .side-inline {display:flex; gap:7px; align-items:center}
+    .side-inline>*:first-child {min-width:0;flex:1}
+    .side-inline>.btn {white-space:nowrap; flex-shrink:0}
+    .hint {color:var(--subtle);font-size:11px;line-height:1.45}
+    .side-subhead {color:#a5b8c4; font-size:11px; font-weight:660; margin-bottom:6px}
+    .section-divider {height:1px;background:var(--border-soft);margin:14px 0}
+    .sidebar {gap:24px}
+    .sidebar select {text-overflow:ellipsis}
+    .sidebar .btn {font-size:11px}
+    .toolbar {border:1px solid var(--border);background:#171d22;border-radius:8px;padding:12px 15px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .toolbar label {color:#a8b7c4;font-size:11px;display:flex;align-items:center;gap:7px}
+    .toolbar input[type=text] {width:min(235px,40vw);height:31px}
+    .toolbar select {width:auto;max-width:180px;height:31px}
+    .toolbar .toolbar-group {display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .toolbar .mini-stat {color:var(--subtle);font-size:11px}
+    .checkbox-inline {display:inline-flex;gap:6px;align-items:center;cursor:pointer;color:#9bb0bd;font-size:11px}
+    .checkbox-inline input {accent-color:var(--accent)}
+    .preview-rack.zoned {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:'empty front empty2' 'left roof right' 'other rear interior';gap:12px;align-items:stretch}
+    .preview-rack.zoned .rack-section {background:#10151a;border:1px solid #2c353d;border-radius:8px;padding:10px;min-height:86px}
+    .preview-rack.zoned .rack-section[data-zone="Front"] {grid-area:front}
+    .preview-rack.zoned .rack-section[data-zone="Roof"] {grid-area:roof}
+    .preview-rack.zoned .rack-section[data-zone="Rear"] {grid-area:rear}
+    .preview-rack.zoned .rack-section[data-zone="Left"] {grid-area:left}
+    .preview-rack.zoned .rack-section[data-zone="Right"] {grid-area:right}
+    .preview-rack.zoned .rack-section[data-zone="Interior"] {grid-area:interior}
+    .preview-rack.zoned .rack-section[data-zone="Other"] {grid-area:other}
+    .preview-rack.zoned .rack {border:none;padding:2px;box-shadow:none;background:transparent;min-height:25px;gap:6px}
+    .preview-rack.zoned .lamp {min-width:45px;flex-basis:58px;max-width:100%;height:40px}
+    .lamp {flex-direction:column;min-height:38px;height:42px;gap:0px;padding:2px;overflow:hidden;line-height:1.2;min-width:65px}
+    .lamp .lamp-number {font-size:10px;font-weight:750}
+    .lamp .lamp-name {font-size:9px;font-weight:550;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#95a5b4}
+    .lamp.on .lamp-name {color:#102b31}
+    .lamp.preview-selected {outline:2px solid #98d4de;outline-offset:1px}
+    .preview-settings {display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .preview-settings select {width:auto;height:28px;font-size:11px;padding:0 7px}
+    .modebar {padding:11px 18px;border-top:1px solid var(--border-soft);background:#141a20}
+    .modebar-top {display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+    .switch-row {display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+    .mode-switch {border:1px solid #39444d;background:#1b252c;color:#9fb2bd;padding:7px 10px;border-radius:5px;font-size:11px;font-weight:600}
+    .mode-switch[aria-pressed="true"] {background:#364c53;color:#e5f7f9;border-color:#93c2cb}
+    .mode-switch:disabled {opacity:.32}
+    #trafficDirection {width:auto;height:30px;font-size:11px}
+    .light-tag {font-size:9px;letter-spacing:.025em;background:#24313a;border:1px solid #3b4853;border-radius:3px;padding:1px 4px;color:#9fb3c1;white-space:nowrap}
+    .row-label {gap:4px}
+    .row-label .row-name {min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .row-index {margin-left:auto}
+    .row-action {border:none;background:transparent;color:#8797a5;border-radius:3px;font-size:15px;padding:1px 3px;line-height:1.3}
+    .row-action:hover {background:#304049;color:#f1f8fb}
+    .group-heading {padding-top:9px!important;padding-bottom:6px!important}
+    .group-heading .group-toggle {border:0;background:transparent;text-align:left;color:#b4c9d2;font-size:11px;font-weight:690;letter-spacing:.035em;cursor:pointer;padding:5px 7px;border-radius:4px;width:100%}
+    .group-heading .group-toggle:hover {background:#2c353e}
+    .group-count {margin-left:6px;color:#8195a4;font-size:10px;font-weight:500}
+    .cell {min-height:29px}
+    .dialog-body .two-col {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .dialog-body .helper {font-size:10px;color:var(--subtle);margin-top:4px}
+    dialog {width:min(95vw,550px);max-height:92vh;overflow:auto}
+    .dialog-body input[type=color] {width:100%;height:35px;padding:3px}
+    .dialog-body input[type=number] {width:100%;height:35px;padding:0 10px}
+    .dialog-body select {height:35px}
+    .dialog-body #channelBrightness {width:100%}
+    .dialog-body .meter {color:#bac9d2;font-size:11px;font-variant-numeric:tabular-nums}
+    .bar-note {margin:8px 18px 12px;font-size:11px;color:var(--subtle)}
+    .tool-help {font-size:11px;color:var(--muted);padding:8px 0}
+    #customBrush {width:29px;height:28px;border:1px solid #52616d;border-radius:4px;cursor:pointer;padding:2px;background:#1c252c}
+    .empty-state {grid-column:1/-1;padding:22px 8px;color:#8c9dab;text-align:center;font-size:12px}
+    .nav-stat {color:#a6c8d0;font-size:10px;font-variant-numeric:tabular-nums}
+    .notice {background:#17232a;border:1px solid #39505c;border-radius:6px;padding:8px 10px;font-size:11px;color:#9cbac4;line-height:1.45}
+    @media (max-width:1150px) { .preview-rack.zoned {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:'front roof' 'left right' 'rear interior' 'other other'} }
+    @media (max-width:750px) {.toolbar {padding:10px} .preview-rack.zoned{grid-template-columns:repeat(2,minmax(0,1fr))} .preview-rack.zoned .lamp{min-width:40px} .modebar{padding:12px} }
+    @media (max-width:470px) {.preview-rack.zoned{display:flex;flex-direction:column} .toolbar input[type=text]{width:100%} .toolbar .toolbar-group{width:100%} .dialog-body .two-col{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
@@ -131,10 +204,10 @@
   <header class="topbar">
     <div class="identity">
       <div class="logo" aria-hidden="true">///</div>
-      <div><div class="brand">ELS STUDIO</div><div class="brand-sub">S&box / Lighting Pattern Editor</div></div>
+      <div><div class="brand">ELS STUDIO</div><div class="brand-sub">S&box / Pattern &amp; Fixture Editor</div></div>
     </div>
     <div class="top-actions">
-      <span id="saveState" class="saved">Saved locally</span>
+      <span id="saveState" class="saved">Saved locally</span><button class="btn btn-quiet" type="button" id="undoBtn" title="Undo (Ctrl+Z)">Undo</button><button class="btn btn-quiet" type="button" id="redoBtn" title="Redo (Ctrl+Y)">Redo</button>
       <label class="btn file-button" tabindex="0">Import JSON <input type="file" id="importFile" accept=".json,application/json" aria-label="Import pattern JSON"></label>
       <button id="copyBtn" class="btn" type="button">Copy JSON</button>
       <button id="exportBtn" class="btn btn-strong" type="button">Export pattern</button>
@@ -165,24 +238,43 @@
         </div>
       </section>
       <section>
-        <div class="eyebrow">Channels <span id="channelCount">12 / 64</span></div>
-        <button id="addChannelBtn" class="btn" style="width:100%;text-align:left" type="button">+ Add light channel</button>
-        <div class="section-foot">Click a channel name in the timeline to edit it. Additions apply to all stages.</div>
+        <div class="eyebrow">Light fixtures <span id="channelCount">12 / 128</span></div>
+        <div class="side-subhead">Add a lighting assembly</div>
+        <div class="form-stack">
+          <select id="assemblySelect" aria-label="Lighting assembly type"></select>
+          <button id="addAssemblyBtn" class="btn btn-strong" style="width:100%;text-align:center" type="button">+ Add assembly</button>
+          <button id="addChannelBtn" class="btn btn-quiet" style="width:100%;text-align:center" type="button">+ Add individual fixture</button>
+          <button id="demoBtn" class="btn btn-quiet" style="width:100%;text-align:center" type="button">Load full vehicle example</button>
+        </div>
+        <div class="section-foot">Assemblies add each segment as a separate, editable channel. All lighting stages share the fixture list.</div>
       </section>
-      <p class="sidebar-foot">Pattern data exports as <strong>JSON</strong>. To operate physical lights in S&box, a separate in-game C# controller is required.</p>
+      <section>
+        <div class="eyebrow">Editor tools</div>
+        <div class="form-stack">
+          <div><label class="field-label" for="copySource">Copy another stage's sequence</label><div class="side-inline"><select id="copySource"><option value="1">Stage 1 · Cruise</option><option value="2">Stage 2 · Warning</option><option value="3">Stage 3 · Emergency</option></select><button class="btn" type="button" id="copyStageBtn">Copy</button></div></div>
+          <label class="checkbox-inline"><input id="showOnlyProgrammed" type="checkbox"> Only show programmed channels</label>
+          <button id="expandAllBtn" type="button" class="btn btn-quiet">Expand all groups</button>
+        </div>
+      </section>
+      <p class="sidebar-foot">Pattern data exports as <strong>JSON</strong>. The website edits patterns and previews manual switches. An in-game S&box lighting controller is not included yet.</p>
     </aside>
     <main class="main">
       <div class="page-heading">
         <div><div class="kicker">Pattern editor / Stage <span id="stageIndex">03</span></div><h1 id="pageTitle">Emergency</h1><p class="subhead">Edit the lighting sequence using the timeline below.</p></div>
         <div class="meta"><span><b id="metaChannels">12</b> channels</span><span><b id="metaSteps">16</b> steps</span><span><b id="metaDuration">1.60 s</b> / loop</span></div>
       </div>
+      <div class="toolbar" aria-label="Channel filters">
+        <div class="toolbar-group"><label for="channelSearch">Find fixture</label><input id="channelSearch" type="text" placeholder="Search light, group or function" spellcheck="false"><select id="zoneFilter" aria-label="Filter location"><option value="all">All locations</option><option>Roof</option><option>Front</option><option>Rear</option><option>Left</option><option>Right</option><option>Interior</option><option>Other</option></select></div>
+        <div class="toolbar-group"><span class="mini-stat" id="filterCount">Showing all channels</span><button class="btn btn-quiet" id="clearFilters" type="button">Clear filters</button></div>
+      </div>
       <section class="panel" aria-label="Lighting preview">
-        <div class="panel-header"><span class="panel-heading">Live preview</span><div class="panel-side"><span><span class="live-dot"></span> <span id="playState">Playing</span></span><button type="button" class="btn" id="playBtn">Pause</button></div></div>
-        <div class="preview-body"><div class="preview-rack" id="previewRack"></div></div>
-        <div class="preview-bottom"><div class="playhead-stat"><span id="frameLabel">Step 01 / 16</span><div class="progress"><div class="progress-inner" id="progress"></div></div></div><span style="color:var(--subtle);font-size:11px">Logical channel preview · not a 3D vehicle render</span></div>
+        <div class="panel-header"><span class="panel-heading">Live fixture preview</span><div class="panel-side"><div class="preview-settings"><label for="previewLayout">Layout</label><select id="previewLayout"><option value="zone">Vehicle zones</option><option value="group">Lighting groups</option></select></div><span><span class="live-dot"></span> <span id="playState">Playing</span></span><button type="button" class="btn" id="playBtn">Pause</button></div></div>
+        <div class="preview-body"><div class="preview-rack zoned" id="previewRack"></div></div>
+        <div class="modebar"><div class="modebar-top"><span class="muted-label">Test auxiliary functions</span><span class="hint">Preview-only switches · independent of the current lighting stage</span></div><div class="switch-row" id="functionSwitches"></div></div>
+        <div class="preview-bottom"><div class="playhead-stat"><span id="frameLabel">Step 01 / 16</span><div class="progress"><div class="progress-inner" id="progress"></div></div></div><span style="color:var(--subtle);font-size:11px">Click a fixture to edit · not a 3D model</span></div>
       </section>
       <section class="panel" aria-label="Pattern timeline editor">
-        <div class="panel-header"><span class="panel-heading">Sequence timeline</span><div class="panel-side"><span>Click / drag to paint · Right-click to erase</span></div></div>
+        <div class="panel-header"><span class="panel-heading">Sequence timeline</span><div class="panel-side"><span>Drag to paint · Right-click to erase · Click names to edit</span></div></div>
         <div class="editor-controls">
           <div class="brush-area" role="group" aria-label="Color selection">
             <span class="muted-label">Paint</span>
@@ -191,351 +283,545 @@
             <button class="brush" type="button" data-color="#ffad34"><span class="swatch" style="--swatch:#ffad34"></span>Amber</button>
             <button class="brush" type="button" data-color="#f9fbff"><span class="swatch" style="--swatch:#f9fbff"></span>White</button>
             <button class="brush" type="button" data-color="#65ddaa"><span class="swatch" style="--swatch:#65ddaa"></span>Green</button>
-            <button class="brush" type="button" data-color="off"><span class="swatch"></span>Erase</button>
+            <button class="brush" type="button" data-color="off"><span class="swatch"></span>Erase</button><input id="customBrush" type="color" value="#bc8cff" title="Choose a custom light color" aria-label="Custom paint color"> <button class="brush" id="customBrushBtn" type="button">Custom</button>
           </div>
           <span class="editor-notes" id="editorStatus">Stage 3 active</span>
         </div>
         <div class="timeline-wrap"><div class="timeline" id="timeline" aria-label="Lighting pattern timeline"></div></div>
-        <div class="presetbar"><div class="preset-buttons"><span class="muted-label" style="align-self:center">Presets</span><button class="small-btn" type="button" data-preset="alternate">Alternating</button><button class="small-btn" type="button" data-preset="double">Double flash</button><button class="small-btn" type="button" data-preset="sweep">Sweep</button><button class="small-btn" type="button" data-preset="steady">Steady</button><button class="small-btn" type="button" data-preset="clear">Clear stage</button></div><span class="editor-notes">Presets affect the selected stage only.</span></div>
+        <div class="presetbar"><div class="preset-buttons"><span class="muted-label" style="align-self:center">Presets</span><button class="small-btn" type="button" data-preset="alternate">Alternating</button><button class="small-btn" type="button" data-preset="double">Double flash</button><button class="small-btn" type="button" data-preset="sweep">Sweep</button><button class="small-btn" type="button" data-preset="steady">Steady</button><button class="small-btn" type="button" data-preset="clear">Clear stage</button></div><span class="editor-notes"><label class="checkbox-inline"><input id="presetVisibleOnly" type="checkbox"> Apply only to visible channels</label></span></div>
       </section>
-      <div class="info-footer"><span><strong>ELS Studio</strong> · Browser-based sequence designer</span><span>JSON schema v1 · Up to 64 channels · 3 stages</span></div>
+      <div class="info-footer"><span><strong>ELS Studio</strong> · Browser-based sequence designer</span><span>JSON schema v2 · Up to 128 channels · 3 stages · Function circuits</span></div>
     </main>
   </div>
 </div>
 <dialog id="channelDialog" aria-labelledby="dialogTitle">
   <form id="channelForm" method="dialog">
-    <div class="dialog-top" id="dialogTitle">Add light channel</div>
+    <div class="dialog-top" id="dialogTitle">Add light fixture</div>
     <div class="dialog-body">
-      <div><label class="field-label" for="channelName">Channel name</label><input id="channelName" type="text" maxlength="60" required placeholder="e.g. Rear window · left" autocomplete="off"></div>
-      <div><label class="field-label" for="channelGroup">Lighting group</label><input id="channelGroup" type="text" maxlength="36" required list="groupSuggestions" placeholder="e.g. Lightbar" autocomplete="off"><datalist id="groupSuggestions"><option value="Lightbar"><option value="Auxiliary"><option value="Grille"><option value="Mirrors"><option value="Rear window"><option value="Running board"><option value="Traffic advisor"></datalist></div>
+      <div class="two-col">
+        <div><label class="field-label" for="channelName">Fixture name</label><input id="channelName" type="text" maxlength="60" required placeholder="e.g. Driver-side alley" autocomplete="off"></div>
+        <div><label class="field-label" for="channelGroup">Group / assembly</label><input id="channelGroup" type="text" maxlength="36" required list="groupSuggestions" placeholder="e.g. Lightbar" autocomplete="off"><datalist id="groupSuggestions"><option value="Lightbar · front"><option value="Lightbar · rear"><option value="Underbar"><option value="Alley lights"><option value="Takedowns"><option value="Rear auxiliary"><option value="Grille"><option value="Front window"><option value="Rear window"><option value="Mirrors"><option value="Traffic advisor"><option value="Scene lighting"><option value="Custom"></datalist></div>
+      </div>
+      <div class="two-col">
+        <div><label class="field-label" for="channelType">Fixture type</label><select id="channelType"></select></div>
+        <div><label class="field-label" for="channelZone">Mounted location</label><select id="channelZone"><option>Roof</option><option>Front</option><option>Rear</option><option>Left</option><option>Right</option><option>Interior</option><option>Other</option></select></div>
+      </div>
+      <div class="two-col">
+        <div><label class="field-label" for="channelCircuit">Control circuit</label><select id="channelCircuit"></select><div class="helper">Special circuits have independent switches in the preview.</div></div>
+        <div><label class="field-label" for="channelColorProfile">Available LED colors</label><select id="channelColorProfile"><option value="any">Any color</option><option value="redblue">Red + blue</option><option value="redbluewhite">Red + blue + white</option><option value="red">Red</option><option value="blue">Blue</option><option value="white">White</option><option value="amber">Amber</option><option value="green">Green</option><option value="custom">Custom color</option></select></div>
+      </div>
+      <div class="two-col">
+        <div id="customColorRow" style="display:none"><label class="field-label" for="channelCustomColor">Custom LED color</label><input id="channelCustomColor" type="color" value="#bc8cff"></div>
+        <div><label class="field-label" for="channelPhase">Timing offset (steps)</label><input id="channelPhase" type="number" min="0" max="63" step="1" value="0"><div class="helper">Shifts the fixture's preview timing without changing its row.</div></div>
+      </div>
+      <div><label class="field-label" for="channelBrightness">Fixture brightness <span class="meter" id="channelBrightnessValue">100%</span></label><input id="channelBrightness" type="range" min="5" max="100" step="5" value="100"></div>
+      <div class="notice">Each channel is independent. Use the same group name for related fixtures; use a dedicated circuit for lights you want to operate separately from warning stages.</div>
     </div>
-    <div class="dialog-actions"><button class="btn btn-quiet" type="button" id="cancelDialog">Cancel</button><button class="btn btn-strong" id="submitChannel" type="submit">Add channel</button></div>
+    <div class="dialog-actions"><button class="btn btn-quiet" type="button" id="cancelDialog">Cancel</button><button class="btn btn-strong" id="submitChannel" type="submit">Add fixture</button></div>
   </form>
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
   'use strict';
-  const MAX_CHANNELS = 64;
-  const COLORS = ['#ff4059','#338aff','#ffad34','#f9fbff','#65ddaa'];
+  const MAX_CHANNELS = 128;
+  const KEY = 'sbox-els-studio-v01'; // v0.2 storage key retained on purpose
+  const BASE_COLORS = ['#ff4059','#338aff','#ffad34','#f9fbff','#65ddaa'];
+  const PALETTE = {red:'#ff4059',blue:'#338aff',amber:'#ffad34',white:'#f9fbff',green:'#65ddaa'};
   const STEP_CHOICES = [25,50,75,100,125,150,200,250,500];
   const COUNT_CHOICES = [8,16,24,32,48,64];
-  const KEY = 'sbox-els-studio-v01'; // Keeps previous projects when upgrading the editor.
-  const DEFAULT_CHANNELS = [
-    {id:'bar_fl_outer',label:'Front left · outer',group:'Lightbar'},
-    {id:'bar_fl_mid',label:'Front left · mid',group:'Lightbar'},
-    {id:'bar_fl_inner',label:'Front left · inner',group:'Lightbar'},
-    {id:'bar_fr_inner',label:'Front right · inner',group:'Lightbar'},
-    {id:'bar_fr_mid',label:'Front right · mid',group:'Lightbar'},
-    {id:'bar_fr_outer',label:'Front right · outer',group:'Lightbar'},
-    {id:'bar_rl',label:'Rear left',group:'Lightbar'},
-    {id:'bar_rr',label:'Rear right',group:'Lightbar'},
-    {id:'grille_l',label:'Grille left',group:'Auxiliary'},
-    {id:'grille_r',label:'Grille right',group:'Auxiliary'},
-    {id:'mirror_l',label:'Mirror left',group:'Auxiliary'},
-    {id:'mirror_r',label:'Mirror right',group:'Auxiliary'}
+  const STAGES = [{id:1,name:'Cruise',brightness:.3},{id:2,name:'Warning',brightness:.7},{id:3,name:'Emergency',brightness:1}];
+  const ZONES = ['Roof','Front','Rear','Left','Right','Interior','Other'];
+  const TYPES = [
+    ['lightbar','Lightbar segment'],['underbar','Underbar / front lower'],['alley','Alley light'],
+    ['takedown','Takedown / forward white'],['grille','Grille / hideaway'],['rear_aux','Rear auxiliary'],
+    ['window','Window / visor / deck'],['mirror','Mirror / fender'],['bumper','Bumper / perimeter'],
+    ['running','Running board / rocker'],['traffic','Traffic advisor'],['scene','Scene / work light'],
+    ['other','Other / custom fixture']
   ];
-  const STAGE_DEFS = [{id:1,name:'Cruise',brightness:.3},{id:2,name:'Warning',brightness:.7},{id:3,name:'Emergency',brightness:1}];
+  const CIRCUITS = [
+    ['warning','Warning stages',''],['alley_left','Left alley','White · steady'],
+    ['alley_right','Right alley','White · steady'],['takedown','Takedown','White · steady'],
+    ['rear_scene','Rear auxiliary / scene','White · steady'],['traffic','Traffic advisor','Amber · sweeping'],
+    ['scene','Scene / perimeter','White · steady']
+  ];
+  const PROFILES = {
+    any:null, redblue:[PALETTE.red,PALETTE.blue], redbluewhite:[PALETTE.red,PALETTE.blue,PALETTE.white],
+    red:[PALETTE.red],blue:[PALETTE.blue],white:[PALETTE.white],amber:[PALETTE.amber],green:[PALETTE.green]
+  };
+  const TEMPLATES = [
+    {key:'frontbar',label:'Front lightbar · 8 modules',group:'Front lightbar',type:'lightbar',zone:'Roof',circuit:'warning',colorProfile:'redblue',names:['Outer L','Mid L2','Mid L1','Inner L','Inner R','Mid R1','Mid R2','Outer R']},
+    {key:'rearbar',label:'Rear lightbar · 6 modules',group:'Rear lightbar',type:'lightbar',zone:'Roof',circuit:'warning',colorProfile:'redblue',names:['Outer L','Mid L','Inner L','Inner R','Mid R','Outer R']},
+    {key:'underbar',label:'Underbar / front lower · 4',group:'Underbar',type:'underbar',zone:'Front',circuit:'warning',colorProfile:'redbluewhite',names:['Outer L','Inner L','Inner R','Outer R']},
+    {key:'alleys',label:'Alley lights · left and right',group:'Alley lights',type:'alley',colorProfile:'white',names:['Left','Right'],zones:['Left','Right'],circuits:['alley_left','alley_right']},
+    {key:'takedowns',label:'Takedown lights · 2',group:'Takedowns',type:'takedown',zone:'Front',circuit:'takedown',colorProfile:'white',names:['Left','Right']},
+    {key:'grille',label:'Grille / hideaways · 4',group:'Grille',type:'grille',zone:'Front',circuit:'warning',colorProfile:'redblue',names:['Outer L','Inner L','Inner R','Outer R']},
+    {key:'rearaux',label:'Rear auxiliary warning · 4',group:'Rear auxiliary',type:'rear_aux',zone:'Rear',circuit:'warning',colorProfile:'redblue',names:['Upper L','Lower L','Lower R','Upper R']},
+    {key:'frontwindow',label:'Front windshield / visor · 2',group:'Front window',type:'window',zone:'Front',circuit:'warning',colorProfile:'redblue',names:['Left','Right']},
+    {key:'rearwindow',label:'Rear window · 4',group:'Rear window',type:'window',zone:'Rear',circuit:'warning',colorProfile:'redblue',names:['Outer L','Inner L','Inner R','Outer R']},
+    {key:'sidewindow',label:'Side windows · 2',group:'Side window',type:'window',colorProfile:'redblue',circuit:'warning',names:['Left','Right'],zones:['Left','Right']},
+    {key:'mirrors',label:'Mirror / fender · 2',group:'Mirrors',type:'mirror',circuit:'warning',colorProfile:'redblue',names:['Left','Right'],zones:['Left','Right']},
+    {key:'frontbumper',label:'Front bumper · 2',group:'Front bumper',type:'bumper',zone:'Front',circuit:'warning',colorProfile:'redblue',names:['Left','Right']},
+    {key:'rearbumper',label:'Rear bumper · 2',group:'Rear bumper',type:'bumper',zone:'Rear',circuit:'warning',colorProfile:'redblue',names:['Left','Right']},
+    {key:'running',label:'Running boards · 4',group:'Running boards',type:'running',circuit:'warning',colorProfile:'redblue',names:['L Front','L Rear','R Front','R Rear'],zones:['Left','Left','Right','Right']},
+    {key:'reardeck',label:'Rear deck · 4',group:'Rear deck',type:'window',zone:'Interior',circuit:'warning',colorProfile:'redblue',names:['Outer L','Inner L','Inner R','Outer R']},
+    {key:'traffic',label:'Traffic advisor · 6 amber',group:'Traffic advisor',type:'traffic',zone:'Rear',circuit:'traffic',colorProfile:'amber',names:['Segment 1','Segment 2','Segment 3','Segment 4','Segment 5','Segment 6']},
+    {key:'rearscene',label:'Rear scene / work · 2',group:'Rear scene lights',type:'scene',zone:'Rear',circuit:'rear_scene',colorProfile:'white',names:['Left','Right']},
+    {key:'sidescene',label:'Side scene / flood · 2',group:'Side scene lights',type:'scene',circuit:'scene',colorProfile:'white',names:['Left','Right'],zones:['Left','Right']}
+  ];
+  const DEMO_KEYS = ['frontbar','rearbar','underbar','alleys','takedowns','grille','rearaux','frontwindow','rearwindow','sidewindow','mirrors','traffic','rearscene'];
   const $ = id => document.getElementById(id);
-  const fresh = () => {
-    const channels = DEFAULT_CHANNELS.map(c => ({...c}));
-    const stages = STAGE_DEFS.map(s => ({...s,rows:channels.map(() => Array(16).fill(null))}));
-    for(let t=0;t<16;t++) {
-      stages[0].rows[0][t] = '#ff4059';
-      stages[0].rows[5][t] = '#338aff';
-      for(let r=0;r<channels.length;r++) {
-        const color = r%2===0 ? '#ff4059' : '#338aff';
-        if((t<8)===(r<6)) stages[1].rows[r][t] = color;
-        const double = t%8<2 || (t%8>=3 && t%8<5);
-        if(double === (((t>>3)%2===0)===(r%2===0))) stages[2].rows[r][t] = color;
-      }
-    }
-    return {format:'sbox-els-pattern',version:1,name:'Untitled Pattern',stepMs:100,stepCount:16,channels,stages};
+  const hex = v => typeof v==='string' && /^#[0-9a-f]{6}$/i.test(v);
+  const normalizedHex = v => String(v).toLowerCase();
+  const allowed = ch => ch.colorProfile==='custom' ? [ch.customColor] : (PROFILES[ch.colorProfile] || null);
+  const firstColor = ch => allowed(ch)?.[0] || PALETTE.white;
+  const chooseColor = (ch,index) => {
+    const a=allowed(ch);
+    if(!a || a.length===0) return index%2===0?PALETTE.red:PALETTE.blue;
+    return a[index%a.length];
   };
-  const sanitize = raw => {
-    if (!raw || raw.format!=='sbox-els-pattern' || raw.version!==1 || !Array.isArray(raw.channels) || !Array.isArray(raw.stages)) throw Error('Not a supported ELS pattern file.');
-    if (!Number.isInteger(raw.stepCount) || !COUNT_CHOICES.includes(raw.stepCount) || !STEP_CHOICES.includes(raw.stepMs)) throw Error('Invalid step count or duration.');
-    if (raw.channels.length<1 || raw.channels.length>MAX_CHANNELS) throw Error('Pattern must have 1 to 64 channels.');
-    if (raw.stages.length!==3) throw Error('Pattern requires three stages.');
-    const seen = new Set();
-    const channels = raw.channels.map(c => {
-      if (!c || typeof c.id!=='string' || typeof c.label!=='string' || typeof c.group!=='string') throw Error('Invalid channel definition.');
-      const id=c.id.trim(), label=c.label.trim(), group=c.group.trim();
-      if (!id || id.length>100 || !label || label.length>60 || !group || group.length>36 || seen.has(id)) throw Error('Channel identifiers must be unique and names must not be empty.');
-      seen.add(id);
-      return {id,label,group};
-    });
-    const stages = STAGE_DEFS.map((def,i) => {
-      const s=raw.stages[i];
-      if (!s || s.id!==def.id || !Array.isArray(s.rows) || s.rows.length!==channels.length) throw Error('Invalid stage layout.');
-      const rows=s.rows.map(row => {
-        if (!Array.isArray(row) || row.length!==raw.stepCount || row.some(c=>c!==null && !COLORS.includes(c))) throw Error('Invalid colors or step data.');
-        return row.slice();
-      });
-      return {id:def.id,name:def.name,brightness:Number.isFinite(s.brightness)?Math.min(1,Math.max(.1,s.brightness)):def.brightness,rows};
-    });
-    let name=String(raw.name||'Untitled Pattern').trim().slice(0,64) || 'Untitled Pattern';
-    // Replace the old demonstration title when upgrading saved projects.
-    if (name.toLowerCase() === ['os','prey response 01'].join('')) name='Untitled Pattern';
-    return {format:'sbox-els-pattern',version:1,name,stepMs:raw.stepMs,stepCount:raw.stepCount,channels,stages};
+  const nameFor = color => Object.keys(PALETTE).find(n=>PALETTE[n]===color) || (color||'off');
+  const defaultsFromGroup = (group,label='') => {
+    const g=(group+' '+label).toLowerCase();
+    if(/alley/.test(g))return {type:'alley',zone:/right/.test(g)?'Right':'Left',circuit:/right/.test(g)?'alley_right':'alley_left',colorProfile:'white'};
+    if(/takedown/.test(g))return {type:'takedown',zone:'Front',circuit:'takedown',colorProfile:'white'};
+    if(/advisor|directional/.test(g))return {type:'traffic',zone:'Rear',circuit:'traffic',colorProfile:'amber'};
+    if(/rear.*scene|rear.*work/.test(g))return {type:'scene',zone:'Rear',circuit:'rear_scene',colorProfile:'white'};
+    if(/scene|flood|work/.test(g))return {type:'scene',zone:'Other',circuit:'scene',colorProfile:'white'};
+    if(/underbar|lower bar/.test(g))return {type:'underbar',zone:'Front',circuit:'warning',colorProfile:'redbluewhite'};
+    if(/grille|grill/.test(g))return {type:'grille',zone:'Front',circuit:'warning',colorProfile:'redblue'};
+    if(/mirror/.test(g))return {type:'mirror',zone:'Left',circuit:'warning',colorProfile:'redblue'};
+    if(/running|rocker/.test(g))return {type:'running',zone:'Left',circuit:'warning',colorProfile:'redblue'};
+    if(/rear.*window|rear.*deck/.test(g))return {type:'window',zone:'Rear',circuit:'warning',colorProfile:'redblue'};
+    if(/front.*window|windshield|visor/.test(g))return {type:'window',zone:'Front',circuit:'warning',colorProfile:'redblue'};
+    if(/window/.test(g))return {type:'window',zone:'Interior',circuit:'warning',colorProfile:'redblue'};
+    if(/rear.*aux/.test(g))return {type:'rear_aux',zone:'Rear',circuit:'warning',colorProfile:'redblue'};
+    if(/bumper/.test(g))return {type:'bumper',zone:/rear/.test(g)?'Rear':'Front',circuit:'warning',colorProfile:'redblue'};
+    if(/lightbar|bar_/.test(g))return {type:'lightbar',zone:'Roof',circuit:'warning',colorProfile:'redblue'};
+    return {type:'other',zone:'Other',circuit:'warning',colorProfile:'any'};
   };
-  let data=fresh(), activeStage=3, brush=COLORS[0], playing=true, head=0, clock=performance.now();
-  let dragging=false, dragColor=null, editingIndex=null, prevHead=-1;
-  try { const cached=localStorage.getItem(KEY); if(cached) data=sanitize(JSON.parse(cached)); } catch (e) { console.warn('Previous local project could not be loaded:',e); }
-  function save() {
-    try { localStorage.setItem(KEY,JSON.stringify(data)); $('saveState').textContent='Saved locally'; }
-    catch { $('saveState').textContent='Local save unavailable — export a file'; }
+  function enrich(c) {
+    const inferred=defaultsFromGroup(c.group,c.label);
+    const colorProfile=Object.hasOwn(PROFILES,c.colorProfile)?c.colorProfile:inferred.colorProfile;
+    const type=TYPES.some(t=>t[0]===c.type)?c.type:inferred.type;
+    const circuit=CIRCUITS.some(t=>t[0]===c.circuit)?c.circuit:inferred.circuit;
+    const zone=ZONES.includes(c.zone)?c.zone:inferred.zone;
+    return {id:c.id,label:c.label,group:c.group,type,zone,circuit,colorProfile,
+      customColor:hex(c.customColor)?normalizedHex(c.customColor):'#bc8cff',
+      brightness:Number.isFinite(c.brightness)?Math.max(.05,Math.min(1,c.brightness)):1,
+      phase:Number.isInteger(c.phase)?Math.max(0,Math.min(63,c.phase)):0};
   }
-  function notify(text) { const n=$('toast'); n.textContent=text; n.classList.add('show'); clearTimeout(notify.timer); notify.timer=setTimeout(()=>n.classList.remove('show'),2500); }
+  function newState(name='Untitled Pattern') {
+    return {format:'sbox-els-pattern',version:2,name,stepMs:100,stepCount:16,trafficDirection:'right',channels:[],
+      stages:STAGES.map(s=>({...s,rows:[]}))};
+  }
+  const deep = obj => JSON.parse(JSON.stringify(obj));
+  let data=newState(), activeStage=3, brush=PALETTE.red, playing=true, head=0, clock=performance.now(),prevHead=-1;
+  let drag=false, dragColor=null, dragTouched=false, editIndex=null;
+  const previews=[], collapsed=new Set(), manual=new Set(), undo=[],redo=[];
+  let previewLayout='zone';
+  let toastTimer=null;
+  function notify(msg) {const el=$('toast'); el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3000);}
+  function uniqueId(label) {
+    const base=label.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'fixture';
+    let id=base,n=2;const used=new Set(data.channels.map(c=>c.id));while(used.has(id))id=base+'_'+n++;
+    return id;
+  }
+  function putChannel(channel,index=data.channels.length,rows) {
+    const ch=enrich({...channel,id:uniqueId(channel.label)});data.channels.splice(index,0,ch);
+    data.stages.forEach((s,i)=>s.rows.splice(index,0,rows?.[i]?.slice()||Array(data.stepCount).fill(null)));
+    return ch;
+  }
+  function appendTemplate(template) {
+    for(let i=0;i<template.names.length;i++) {
+      const label=template.group+' · '+template.names[i];
+      putChannel({id:label,label,group:template.group,type:template.type,zone:template.zones?.[i]||template.zone||'Other',
+        circuit:template.circuits?.[i]||template.circuit||'warning',colorProfile:template.colorProfile||'any'});
+    }
+  }
+  function newDemo() {
+    data=newState('Complete vehicle example');
+    DEMO_KEYS.forEach(k=>appendTemplate(TEMPLATES.find(x=>x.key===k)));
+    data.channels.forEach((c,r)=>{
+      if(c.circuit!=='warning')return;
+      for(let t=0;t<data.stepCount;t++) {
+        const color=chooseColor(c,r);
+        if((t<8)===(r%2===0))data.stages[1].rows[r][t]=color;
+        const pair=(t%8===0 || t%8===2);
+        if(pair === ((Math.floor(t/8)%2===0)===(r%2===0)))data.stages[2].rows[r][t]=color;
+      }
+    });
+    return data;
+  }
+  function sanitize(raw) {
+    if(!raw || raw.format!=='sbox-els-pattern' || ![1,2].includes(raw.version) || !Array.isArray(raw.channels) || !Array.isArray(raw.stages))throw Error('Not a supported ELS Studio pattern file.');
+    if(!COUNT_CHOICES.includes(raw.stepCount) || !STEP_CHOICES.includes(raw.stepMs))throw Error('Invalid timeline step count or duration.');
+    if(raw.channels.length<1 || raw.channels.length>MAX_CHANNELS || raw.stages.length!==3)throw Error('Expected 1 to 128 channels and three stages.');
+    const ids=new Set();
+    const channels=raw.channels.map(c=>{
+      if(!c || typeof c.id!=='string' || typeof c.group!=='string' || typeof c.label!=='string')throw Error('Invalid channel data.');
+      const id=c.id.trim(),label=c.label.trim(),group=c.group.trim();
+      if(!id || id.length>100 || !label || label.length>60 || !group || group.length>36 || ids.has(id))throw Error('Channel names or identifiers are invalid.');
+      ids.add(id);return enrich({...c,id,label,group});
+    });
+    const stages=STAGES.map((def,i)=>{
+      const s=raw.stages[i];
+      if(!s || s.id!==def.id || !Array.isArray(s.rows) || s.rows.length!==channels.length)throw Error('Stage data does not match its channel list.');
+      const rows=s.rows.map(row=>{
+        if(!Array.isArray(row)||row.length!==raw.stepCount || row.some(v=>v!==null && !hex(v)))throw Error('Timeline contains invalid colors or step data.');
+        return row.map(v=>v===null?null:normalizedHex(v));
+      });
+      return {...def,brightness:Number.isFinite(s.brightness)?Math.min(1,Math.max(.1,s.brightness)):def.brightness,rows};
+    });
+    let title=String(raw.name||'Untitled Pattern').trim().slice(0,64)||'Untitled Pattern';
+    if(title.toLowerCase()===['os','prey response 01'].join(''))title='Untitled Pattern';
+    return {format:'sbox-els-pattern',version:2,name:title,stepMs:raw.stepMs,stepCount:raw.stepCount,
+      trafficDirection:['left','right','center'].includes(raw.trafficDirection)?raw.trafficDirection:'right',channels,stages};
+  }
+  try {const saved=localStorage.getItem(KEY);data=saved?sanitize(JSON.parse(saved)):newDemo();}
+  catch(e) {console.warn('ELS Studio: saved project load failed',e);data=newDemo();}
   const stage=()=>data.stages[activeStage-1];
-  const colorName=c=>({'#ff4059':'red','#338aff':'blue','#ffad34':'amber','#f9fbff':'white','#65ddaa':'green'})[c]||'off';
+  function save() {try{localStorage.setItem(KEY,JSON.stringify(data));$('saveState').textContent='Saved locally';}
+    catch(e){$('saveState').textContent='Local save failed · export a backup';console.warn(e);}}
+  function checkpoint() {undo.push(JSON.stringify(data));if(undo.length>75)undo.shift();redo.length=0;updateHistory();}
+  function updateHistory() {$('undoBtn').disabled=!undo.length;$('redoBtn').disabled=!redo.length;}
+  function restore(from,to) {
+    if(!from.length)return;
+    to.push(JSON.stringify(data));data=sanitize(JSON.parse(from.pop()));head=0;clock=performance.now();collapsed.clear();refresh();save();updateHistory();
+  }
+  function resetClock() {head=0;prevHead=-1;clock=performance.now();}
+  function visible() {
+    const q=$('channelSearch').value.trim().toLowerCase(), zone=$('zoneFilter').value, programmed=$('showOnlyProgrammed').checked;
+    return data.channels.map((c,i)=>({c,i})).filter(({c,i})=>(zone==='all'||c.zone===zone) &&
+      (!q||[c.label,c.group,c.type,c.circuit,c.zone].some(v=>v.toLowerCase().includes(q))) &&
+      (!programmed||stage().rows[i].some(Boolean)));
+  }
+  function grouped(items,property='group') {
+    const groups=new Map();
+    items.forEach(item=>{const name=item.c[property];if(!groups.has(name))groups.set(name,[]);groups.get(name).push(item);});
+    return groups;
+  }
   function updateMeta() {
     $('patternName').value=data.name;
-    $('stepMs').value=String(data.stepMs);
-    $('stepCount').value=String(data.stepCount);
+    $('stepMs').value=String(data.stepMs);$('stepCount').value=String(data.stepCount);
     $('channelCount').textContent=`${data.channels.length} / ${MAX_CHANNELS}`;
     $('addChannelBtn').disabled=data.channels.length>=MAX_CHANNELS;
+    $('addAssemblyBtn').disabled=data.channels.length>=MAX_CHANNELS;
     $('metaChannels').textContent=String(data.channels.length);
     $('metaSteps').textContent=String(data.stepCount);
     $('metaDuration').textContent=(data.stepCount*data.stepMs/1000).toFixed(2)+' s';
     $('brightness').value=String(Math.round(stage().brightness*100));
     $('brightnessDisplay').textContent=Math.round(stage().brightness*100)+'%';
-    $('stageIndex').textContent=String(activeStage).padStart(2,'0');
-    $('pageTitle').textContent=stage().name;
-    $('editorStatus').textContent=`Stage ${activeStage} active`;
-    document.querySelectorAll('.stage-btn').forEach(btn=>{
-      const active=Number(btn.dataset.stage)===activeStage;
-      btn.classList.toggle('active',active); btn.setAttribute('aria-pressed',String(active));
-    });
+    $('stageIndex').textContent=String(activeStage).padStart(2,'0');$('pageTitle').textContent=stage().name;
+    $('editorStatus').textContent=`Stage ${activeStage} · ${data.channels.length} fixtures`;
+    const shown=visible().length;
+    $('filterCount').textContent=`Showing ${shown} / ${data.channels.length} channels`;
+    document.querySelectorAll('.stage-btn').forEach(btn=>{const active=Number(btn.dataset.stage)===activeStage;
+      btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
   }
-  const previews=[];
-  function renderPreviewRack() {
-    previews.length=0;
-    $('previewRack').replaceChildren();
-    const groups=new Map();
-    data.channels.forEach((c,index)=>{
-      if(!groups.has(c.group)) groups.set(c.group,[]);
-      groups.get(c.group).push({c,index});
-    });
-    for(const [name,items] of groups) {
-      const sect=document.createElement('section'); sect.className='rack-section';
-      const hd=document.createElement('div'); hd.className='rack-header';
-      const nameEl=document.createElement('span'); nameEl.textContent=name;
-      const count=document.createElement('span');count.textContent=`${items.length} channels`;
-      hd.append(nameEl,count);
-      const rack=document.createElement('div');rack.className='rack';
-      for(const {c,index} of items) {
-        const lamp=document.createElement('div');lamp.className='lamp';
-        lamp.textContent=String(index+1).padStart(2,'0');lamp.title=`${c.label} (${c.group})`;
-        lamp.setAttribute('aria-label',`${c.label} preview`);
-        rack.appendChild(lamp);previews[index]=lamp;
+  function lightAt(r,t) {
+    const ch=data.channels[r];
+    if(manual.has(ch.circuit) && ch.circuit!=='warning') {
+      if(ch.circuit==='traffic') {
+        const indices=data.channels.map((c,i)=>c.circuit==='traffic'?i:-1).filter(i=>i>=0);
+        const pos=indices.indexOf(r),count=indices.length;
+        if(!count)return null;
+        const at=t%count,dir=data.trafficDirection;
+        let active=false;
+        if(dir==='right')active=pos===at;
+        else if(dir==='left')active=pos===count-1-at;
+        else active=Math.floor(Math.abs(pos-(count-1)/2))===Math.floor((count-1)/2)-Math.min(Math.floor(at/2),Math.floor((count-1)/2));
+        return active?PALETTE.amber:null;
       }
+      return firstColor(ch);
+    }
+    return stage().rows[r][(t+ch.phase)%data.stepCount];
+  }
+  function renderPreviewRack() {
+    previews.length=0;$('previewRack').replaceChildren();
+    $('previewRack').classList.toggle('zoned',previewLayout==='zone');
+    const items=visible();
+    const by=grouped(items,previewLayout==='zone'?'zone':'group');
+    const order=previewLayout==='zone'?ZONES:[...by.keys()];
+    for(const name of order) {
+      const group=by.get(name);if(!group?.length)continue;
+      const sect=document.createElement('section');sect.className='rack-section';
+      if(previewLayout==='zone')sect.dataset.zone=name;
+      const hd=document.createElement('div');hd.className='rack-header';
+      const title=document.createElement('span');title.textContent=name;
+      const quantity=document.createElement('span');quantity.textContent=group.length+' fixtures';hd.append(title,quantity);
+      const rack=document.createElement('div');rack.className='rack';
+      group.forEach(({c,i})=>{
+        const lamp=document.createElement('button');lamp.type='button';lamp.className='lamp';lamp.dataset.edit=i;lamp.title=`${c.label}\n${c.type} · ${c.zone}\nCircuit: ${c.circuit}`;
+        lamp.setAttribute('aria-label',c.label+' light preview');
+        const number=document.createElement('span');number.className='lamp-number';number.textContent=String(i+1).padStart(2,'0');
+        const short=document.createElement('span');short.className='lamp-name';
+        short.textContent=c.label.split(' · ').at(-1)||c.label;
+        lamp.append(number,short);rack.append(lamp);previews[i]=lamp;
+      });
       sect.append(hd,rack);$('previewRack').append(sect);
     }
+    if(!items.length){const el=document.createElement('p');el.className='empty-state';el.textContent='No fixtures match the current filters.';$('previewRack').append(el);}
     renderPreview();
   }
-  function styleCell(cell,color) {
-    cell.classList.toggle('on',Boolean(color));
-    if(color) cell.style.setProperty('--cell',color); else cell.style.removeProperty('--cell');
-  }
-  function renderTimeline() {
-    const timeline=$('timeline');timeline.replaceChildren();timeline.style.setProperty('--steps',data.stepCount);
-    const first=document.createElement('div');first.className='heading first';first.textContent='Channel / step';timeline.append(first);
-    for(let t=0;t<data.stepCount;t++) {
-      const h=document.createElement('div');h.className='heading';h.dataset.head=t;
-      h.textContent=String(t+1).padStart(2,'0'); timeline.append(h);
-    }
-    let lastGroup='';
-    stage().rows.forEach((row,r)=>{
-      const ch=data.channels[r];
-      if(ch.group!==lastGroup) {
-        const group=document.createElement('div');group.className='group-heading';group.textContent=ch.group;
-        timeline.append(group);lastGroup=ch.group;
-      }
-      const label=document.createElement('div');label.className='row-label';
-      const name=document.createElement('button');name.type='button';name.className='row-name';name.dataset.edit=r;
-      name.title=`Edit ${ch.label}`;name.textContent=ch.label;
-      const idx=document.createElement('span');idx.className='row-index';idx.textContent=String(r+1).padStart(2,'0');
-      const remove=document.createElement('button');remove.type='button';remove.className='remove-row';remove.dataset.remove=r;
-      remove.title=`Remove ${ch.label}`;remove.setAttribute('aria-label',`Remove ${ch.label}`);remove.textContent='×';
-      label.append(name,idx,remove);timeline.append(label);
-      row.forEach((color,t)=>{
-        const cell=document.createElement('button');cell.type='button';cell.className='cell';cell.dataset.r=r;cell.dataset.t=t;
-        cell.setAttribute('aria-label',`${ch.label}, step ${t+1}: ${colorName(color)}`);styleCell(cell,color);timeline.append(cell);
-      });
-    });
-    prevHead=-1;updateHead();
-  }
-  function updateHead() {
-    if(head===prevHead) return;
-    const grid=$('timeline');
-    for(const t of [prevHead,head]) {
-      if(t<0)continue;
-      grid.querySelectorAll(`[data-head="${t}"]`).forEach(e=>e.classList.toggle('play-head',t===head));
-      grid.querySelectorAll(`.cell[data-t="${t}"]`).forEach(e=>e.classList.toggle('active-frame',t===head));
-    }
-    prevHead=head;
-  }
   function renderPreview() {
-    if(!previews.length)return;
     const t=Math.max(0,Math.min(data.stepCount-1,head));
-    stage().rows.forEach((row,r)=>{
-      const lamp=previews[r]; if(!lamp)return;
-      const color=row[t]; lamp.classList.toggle('on',Boolean(color));
-      if(color) { lamp.style.setProperty('--light',color); lamp.style.opacity=String(.48+stage().brightness*.52); }
-      else { lamp.style.removeProperty('--light'); lamp.style.opacity='1'; }
+    previews.forEach((el,i)=>{
+      if(!el)return;
+      const ch=data.channels[i], color=lightAt(i,t);
+      el.classList.toggle('on',!!color);
+      if(color) {el.style.setProperty('--light',color);el.style.opacity=String(Math.min(1,.50+(manual.has(ch.circuit)?1:stage().brightness)*ch.brightness*.50));}
+      else {el.style.removeProperty('--light');el.style.opacity='1';}
     });
     $('frameLabel').textContent=`Step ${String(t+1).padStart(2,'0')} / ${data.stepCount}`;
     $('progress').style.width=`${(t+1)*100/data.stepCount}%`;
   }
-  function refresh() { updateMeta(); renderPreviewRack(); renderTimeline();renderPreview();updateHead(); }
-  function updateCell(r,t,color) {
-    if(!Number.isInteger(r)||!Number.isInteger(t)||r<0||r>=data.channels.length||t<0||t>=data.stepCount)return;
-    if(stage().rows[r][t]===color)return;
+  function styleCell(cell,color){cell.classList.toggle('on',Boolean(color));if(color)cell.style.setProperty('--cell',color);else cell.style.removeProperty('--cell');}
+  function el(type,klass,text) {const e=document.createElement(type);if(klass)e.className=klass;if(text!==undefined)e.textContent=text;return e;}
+  function renderTimeline() {
+    const grid=$('timeline');grid.replaceChildren();grid.style.setProperty('--steps',data.stepCount);
+    grid.append(el('div','heading first','Fixture / time'));
+    for(let t=0;t<data.stepCount;t++) {const hd=el('div','heading',String(t+1).padStart(2,'0'));hd.dataset.head=t;hd.title=`${t*data.stepMs} ms`;
+      grid.append(hd);}
+    const g=grouped(visible());
+    g.forEach((items,name)=>{
+      const header=el('div','group-heading');
+      const btn=el('button','group-toggle',(collapsed.has(name)?'▸ ':'▾ ')+name+'  ·  '+items.length);
+      btn.type='button';btn.dataset.collapse=name;btn.setAttribute('aria-expanded',String(!collapsed.has(name)));
+      header.append(btn);grid.append(header);
+      if(collapsed.has(name))return;
+      items.forEach(({c,i})=>{
+        const label=el('div','row-label');
+        const nameButton=el('button','row-name',c.label);nameButton.type='button';nameButton.dataset.edit=i;nameButton.title=`Edit ${c.label} (${c.circuit})`;
+        const count=el('span','row-index',String(i+1).padStart(2,'0'));count.title=`${c.zone} · ${c.type}`;
+        const dupe=el('button','row-action','⧉');dupe.type='button';dupe.title='Duplicate fixture and its patterns';dupe.dataset.duplicate=i;
+        const clear=el('button','row-action','⌫');clear.type='button';clear.title='Clear this fixture in current stage';clear.dataset.clear=i;
+        const remove=el('button','remove-row','×');remove.type='button';remove.title='Delete this fixture from all stages';remove.dataset.remove=i;
+        label.append(nameButton,count,dupe,clear,remove);grid.append(label);
+        stage().rows[i].forEach((color,t)=>{
+          const cell=el('button','cell');cell.type='button';cell.dataset.r=i;cell.dataset.t=t;
+          cell.title=`${c.label} · ${t*data.stepMs} ms · ${nameFor(color)}`;
+          cell.setAttribute('aria-label',`${c.label}, step ${t+1}: ${nameFor(color)}`);
+          styleCell(cell,color);grid.append(cell);
+        });
+      });
+    });
+    if(!g.size){const msg=el('div','empty-state','No matching channels. Clear the filters to see all fixtures.');grid.append(msg);}
+    prevHead=-1;updateHead();
+  }
+  function updateHead() {
+    if(head===prevHead)return;
+    for(const t of [prevHead,head]) {
+      if(t<0)continue;
+      $('timeline').querySelectorAll(`[data-head="${t}"]`).forEach(e=>e.classList.toggle('play-head',t===head));
+      $('timeline').querySelectorAll(`.cell[data-t="${t}"]`).forEach(e=>e.classList.toggle('active-frame',t===head));
+    }
+    prevHead=head;
+  }
+  function renderSwitches() {
+    const elRoot=$('functionSwitches');elRoot.replaceChildren();
+    CIRCUITS.filter(c=>c[0]!=='warning').forEach(([id,label])=>{
+      const count=data.channels.filter(c=>c.circuit===id).length;
+      const btn=el('button','mode-switch',`${label} (${count})`);btn.type='button';btn.dataset.manual=id;
+      btn.setAttribute('aria-pressed',String(manual.has(id)));btn.disabled=count===0;
+      btn.title=count?`Toggle ${label} for preview only`:'No fixtures assigned to this circuit';
+      elRoot.append(btn);
+    });
+    const sel=el('select');sel.id='trafficDirection';sel.title='Traffic advisor preview direction';sel.setAttribute('aria-label','Traffic advisor direction');
+    [['right','Sweep right'],['left','Sweep left'],['center','Center-out']].forEach(([value,label])=>{
+      const o=document.createElement('option');o.value=value;o.textContent=label;sel.append(o);
+    });
+    sel.value=data.trafficDirection;elRoot.append(sel);
+  }
+  function refresh(){updateMeta();renderPreviewRack();renderTimeline();renderSwitches();renderPreview();updateHistory();}
+  function setCell(r,t,color) {
+    if(!Number.isInteger(r)||!Number.isInteger(t)||r<0||r>=data.channels.length||t<0||t>=data.stepCount)return false;
+    const c=data.channels[r],limit=allowed(c);
+    if(color && limit && !limit.includes(color)) {if(!dragTouched)notify(`${c.label} supports only ${c.colorProfile==='custom'?'its custom color':c.colorProfile.replaceAll('blue',' blue').replaceAll('red','red +')} LEDs. Edit its color profile to change that.`);return false;}
+    if(stage().rows[r][t]===color)return false;
     stage().rows[r][t]=color;
     const cell=$('timeline').querySelector(`.cell[data-r="${r}"][data-t="${t}"]`);
-    if(cell) { styleCell(cell,color);cell.setAttribute('aria-label',`${data.channels[r].label}, step ${t+1}: ${colorName(color)}`); }
-    renderPreview();save();
+    if(cell) {styleCell(cell,color);cell.setAttribute('aria-label',`${c.label}, step ${t+1}: ${nameFor(color)}`);cell.title=`${c.label} · ${t*data.stepMs} ms · ${nameFor(color)}`;}
+    renderPreview();save();return true;
   }
+  // Ensure each paint gesture contributes exactly one undo step.
   $('timeline').addEventListener('pointerdown',e=>{
-    if(e.button!==0 && e.button!==2)return;
+    if(e.button!==0&&e.button!==2)return;
     const cell=e.target.closest('.cell');if(!cell)return;
-    e.preventDefault();dragging=true;
+    e.preventDefault();
+    drag=true;dragTouched=false;
     const r=Number(cell.dataset.r),t=Number(cell.dataset.t);
-    dragColor=(e.button===2||brush==='off'||stage().rows[r][t]===brush)?null:brush;
-    updateCell(r,t,dragColor);
+    dragColor=(e.button===2||brush===null||stage().rows[r][t]===brush)?null:brush;
+    checkpoint();dragTouched=setCell(r,t,dragColor);
   });
   document.addEventListener('pointermove',e=>{
-    if(!dragging)return;
+    if(!drag)return;
     const cell=document.elementFromPoint(e.clientX,e.clientY)?.closest('.cell');
-    if(cell && $('timeline').contains(cell)) updateCell(Number(cell.dataset.r),Number(cell.dataset.t),dragColor);
+    if(cell&&$('timeline').contains(cell))dragTouched=setCell(Number(cell.dataset.r),Number(cell.dataset.t),dragColor)||dragTouched;
   });
-  document.addEventListener('pointerup',()=>dragging=false);
-  window.addEventListener('blur',()=>dragging=false);
-  $('timeline').addEventListener('contextmenu',e=>{
-    const cell=e.target.closest('.cell'); if(!cell)return;
-    e.preventDefault(); updateCell(Number(cell.dataset.r),Number(cell.dataset.t),null);
-  });
-  document.querySelectorAll('.brush').forEach(btn=>btn.addEventListener('click',()=>{
-    brush=btn.dataset.color;
-    document.querySelectorAll('.brush').forEach(b=>b.classList.toggle('active',b===btn));
+  document.addEventListener('pointerup',()=>{drag=false;});
+  window.addEventListener('blur',()=>{drag=false;});
+  $('timeline').addEventListener('contextmenu',e=>e.target.closest('.cell')&&e.preventDefault());
+  function selectBrush(color,selected) {
+    brush=color;
+    document.querySelectorAll('.brush').forEach(b=>b.classList.toggle('active',b===selected));
+    if(color) $('editorStatus').textContent='Brush: '+nameFor(color);
+    else $('editorStatus').textContent='Brush: erase';
+  }
+  document.querySelectorAll('.brush[data-color]').forEach(b=>b.addEventListener('click',()=>{
+    selectBrush(b.dataset.color==='off'?null:b.dataset.color,b);
   }));
+  $('customBrush').addEventListener('input',e=>selectBrush(normalizedHex(e.target.value),$('customBrushBtn')));
+  $('customBrushBtn').addEventListener('click',()=>selectBrush(normalizedHex($('customBrush').value),$('customBrushBtn')));
   document.querySelectorAll('.stage-btn').forEach(btn=>btn.addEventListener('click',()=>{
-    activeStage=Number(btn.dataset.stage);head=0;clock=performance.now();refresh();
+    activeStage=Number(btn.dataset.stage);resetClock();refresh();
   }));
-  $('stepMs').addEventListener('change',e=>{
-    const n=Number(e.target.value);if(!STEP_CHOICES.includes(n))return;
-    data.stepMs=n;clock=performance.now();head=0;updateMeta();renderPreview();updateHead();save();
-  });
-  $('stepCount').addEventListener('change',e=>{
-    const n=Number(e.target.value);if(!COUNT_CHOICES.includes(n))return;
-    data.stages.forEach(s=>s.rows.forEach(row=>{
-      if(n>row.length)row.push(...Array(n-row.length).fill(null));else row.length=n;
-    }));
-    data.stepCount=n;clock=performance.now();head=0;refresh();save();
-  });
-  $('brightness').addEventListener('input',e=>{
-    stage().brightness=Number(e.target.value)/100;
-    $('brightnessDisplay').textContent=e.target.value+'%'; renderPreview();save();
-  });
-  $('patternName').addEventListener('input',e=>{data.name=e.target.value.slice(0,64);save();});
+  $('stepMs').addEventListener('change',e=>{const n=Number(e.target.value);if(!STEP_CHOICES.includes(n))return;
+    checkpoint();data.stepMs=n;resetClock();refresh();save();});
+  $('stepCount').addEventListener('change',e=>{const n=Number(e.target.value);if(!COUNT_CHOICES.includes(n))return;
+    checkpoint();data.stages.forEach(s=>s.rows.forEach(row=>{if(n>row.length)row.push(...Array(n-row.length).fill(null));else row.length=n;}));
+    data.stepCount=n;resetClock();refresh();save();});
+  $('brightness').addEventListener('change',e=>{checkpoint();stage().brightness=Number(e.target.value)/100;renderPreview();save();});
+  $('brightness').addEventListener('input',e=>{$('brightnessDisplay').textContent=e.target.value+'%';});
+  $('patternName').addEventListener('change',e=>{checkpoint();data.name=e.target.value.trim().slice(0,64)||'Untitled Pattern';e.target.value=data.name;save();});
   $('playBtn').addEventListener('click',()=>{
-    playing=!playing;
-    if(playing)clock=performance.now() - head*data.stepMs;
-    $('playBtn').textContent=playing?'Pause':'Play';
-    $('playState').textContent=playing?'Playing':'Paused';
+    playing=!playing;if(playing)clock=performance.now()-head*data.stepMs;
+    $('playBtn').textContent=playing?'Pause':'Play';$('playState').textContent=playing?'Playing':'Paused';
   });
   document.addEventListener('keydown',e=>{
-    if(e.code!=='Space'||e.repeat||e.target.closest('input,select,button,dialog'))return;
-    e.preventDefault();$('playBtn').click();
+    if(e.target.closest('input,select,textarea,dialog'))return;
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){e.preventDefault();restore(undo,redo);return;}
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='y'){e.preventDefault();restore(redo,undo);return;}
+    if(e.code==='Space'&&!e.repeat&&!e.target.closest('button')){e.preventDefault();$('playBtn').click();}
+  });
+  $('undoBtn').addEventListener('click',()=>restore(undo,redo));
+  $('redoBtn').addEventListener('click',()=>restore(redo,undo));
+  $('channelSearch').addEventListener('input',refresh);
+  $('zoneFilter').addEventListener('change',refresh);
+  $('showOnlyProgrammed').addEventListener('change',refresh);
+  $('clearFilters').addEventListener('click',()=>{$('channelSearch').value='';$('zoneFilter').value='all';$('showOnlyProgrammed').checked=false;refresh();});
+  $('previewLayout').addEventListener('change',e=>{previewLayout=e.target.value;renderPreviewRack();});
+  $('expandAllBtn').addEventListener('click',()=>{collapsed.clear();renderTimeline();});
+  $('timeline').addEventListener('click',e=>{
+    const toggle=e.target.closest('[data-collapse]');
+    if(toggle){const name=toggle.dataset.collapse;if(collapsed.has(name))collapsed.delete(name);else collapsed.add(name);renderTimeline();return;}
+    const edit=e.target.closest('[data-edit]');if(edit){openDialog(Number(edit.dataset.edit));return;}
+    const clear=e.target.closest('[data-clear]');if(clear){const i=Number(clear.dataset.clear);
+      if(!stage().rows[i].some(Boolean))return;checkpoint();stage().rows[i].fill(null);refresh();save();notify('Cleared fixture in current stage');return;}
+    const dupe=e.target.closest('[data-duplicate]');if(dupe){const i=Number(dupe.dataset.duplicate),c=data.channels[i];
+      if(data.channels.length>=MAX_CHANNELS){notify('Maximum 128 channels');return;}
+      checkpoint();putChannel({...c,label:c.label+' copy'},i+1,data.stages.map(s=>s.rows[i]));refresh();save();notify('Fixture duplicated across all stages');return;}
+    const remove=e.target.closest('[data-remove]');if(remove){const i=Number(remove.dataset.remove),c=data.channels[i];
+      if(data.channels.length===1){notify('At least one fixture is required');return;}
+      if(!confirm(`Delete "${c.label}" from all three stages? This removes its programmed pattern.`))return;
+      checkpoint();data.channels.splice(i,1);data.stages.forEach(s=>s.rows.splice(i,1));refresh();save();notify('Fixture deleted');}
   });
   document.querySelectorAll('[data-preset]').forEach(btn=>btn.addEventListener('click',()=>{
-    const name=btn.dataset.preset,s=stage();
-    for(let r=0;r<data.channels.length;r++)for(let t=0;t<data.stepCount;t++) {
-      const color=r%2===0?'#ff4059':'#338aff';let on=false;
-      if(name==='alternate')on=(t%8<4)===(r%2===0);
-      if(name==='double')on=(t%8===0||t%8===2)===(r%2===0);
-      if(name==='sweep')on=(t%8===r%8||t%8===(7-r%8));
-      if(name==='steady')on=true;
-      s.rows[r][t]=on?color:null;
-    }
-    renderTimeline();renderPreview();save();notify(`${btn.textContent} applied to stage ${activeStage}`);
+    const name=btn.dataset.preset,allVisible=$('presetVisibleOnly').checked;
+    let indices=allVisible?visible().map(v=>v.i):data.channels.map((c,i)=>c.circuit==='warning'||name==='clear'?i:-1).filter(i=>i>=0);
+    if(!indices.length){notify('No matching fixtures for this preset');return;}
+    if(name==='clear'&&!confirm('Clear programmed steps for the selected stage'+(allVisible?' (visible channels only)':' (all channels)')+'?'))return;
+    checkpoint();indices.forEach((r,index)=>{
+      const c=data.channels[r];for(let t=0;t<data.stepCount;t++){
+        let on=false;
+        if(name==='alternate')on=(t%8<4)===(index%2===0);
+        if(name==='double')on=(t%8===0||t%8===2)===(index%2===0);
+        if(name==='sweep')on=t%Math.min(8,data.stepCount)===index%Math.min(8,data.stepCount);
+        if(name==='steady')on=true;
+        stage().rows[r][t]=on?chooseColor(c,index):null;
+      }
+    });refresh();save();notify(`${btn.textContent} applied to ${indices.length} fixture(s)`);
   }));
-  function createUniqueId(name) {
-    const base=name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,48)||'light';
-    const used=new Set(data.channels.map(c=>c.id));let id=base,n=2;
-    while(used.has(id))id=`${base}_${n++}`;
-    return id;
-  }
-  function openChannelDialog(index=null) {
-    editingIndex=index;
-    const edit=index!==null;
-    $('dialogTitle').textContent=edit?'Edit light channel':'Add light channel';
-    $('submitChannel').textContent=edit?'Save changes':'Add channel';
-    $('channelName').value=edit?data.channels[index].label:`Light ${String(data.channels.length+1).padStart(2,'0')}`;
-    $('channelGroup').value=edit?data.channels[index].group:'Lightbar';
-    $('channelDialog').showModal();
-    $('channelName').focus();$('channelName').select();
-  }
-  $('addChannelBtn').addEventListener('click',()=>{
-    if(data.channels.length<MAX_CHANNELS)openChannelDialog();
+  // Add assemblies. Individual modules remain independent, but are organized together.
+  TEMPLATES.forEach(t=>{const opt=document.createElement('option');opt.value=t.key;opt.textContent=t.label;$('assemblySelect').append(opt);});
+  $('addAssemblyBtn').addEventListener('click',()=>{
+    const template=TEMPLATES.find(t=>t.key===$('assemblySelect').value);if(!template)return;
+    if(data.channels.length+template.names.length>MAX_CHANNELS){notify(`Not enough room: the editor supports up to ${MAX_CHANNELS} fixtures`);return;}
+    checkpoint();appendTemplate(template);refresh();save();notify(`Added ${template.names.length} ${template.group} channels`);
   });
+  $('demoBtn').addEventListener('click',()=>{
+    if(!confirm('Replace the current project with a fully equipped example vehicle? Export your pattern before replacing it.'))return;
+    checkpoint();newDemo();manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();notify('Full vehicle example loaded');
+  });
+  $('copyStageBtn').addEventListener('click',()=>{
+    const from=Number($('copySource').value);
+    if(from===activeStage){notify('Select a different stage as the source');return;}
+    if(!confirm(`Replace every row in stage ${activeStage} with the pattern from stage ${from}?`))return;
+    checkpoint();stage().rows=deep(data.stages[from-1].rows);refresh();save();notify(`Copied stage ${from} to stage ${activeStage}`);
+  });
+  $('previewRack').addEventListener('click',e=>{
+    const fixture=e.target.closest('.lamp[data-edit]');if(fixture)openDialog(Number(fixture.dataset.edit));
+  });
+  $('functionSwitches').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-manual]');if(!btn)return;
+    if(manual.has(btn.dataset.manual))manual.delete(btn.dataset.manual);else manual.add(btn.dataset.manual);
+    renderSwitches();renderPreview();
+  });
+  $('functionSwitches').addEventListener('change',e=>{
+    if(e.target.id!=='trafficDirection')return;
+    checkpoint();data.trafficDirection=e.target.value;renderPreview();save();
+  });
+  TYPES.forEach(([id,label])=>{const o=document.createElement('option');o.value=id;o.textContent=label;$('channelType').append(o);});
+  CIRCUITS.forEach(([id,label])=>{const o=document.createElement('option');o.value=id;o.textContent=label;$('channelCircuit').append(o);});
+  function openDialog(index=null) {
+    editIndex=index;const edit=index!==null;
+    const c=edit?data.channels[index]:enrich({id:'new',label:`Light ${String(data.channels.length+1).padStart(2,'0')}`,group:'Custom'});
+    $('dialogTitle').textContent=edit?'Edit fixture':'Add fixture';
+    $('submitChannel').textContent=edit?'Save fixture':'Add fixture';
+    $('channelName').value=c.label;$('channelGroup').value=c.group;
+    $('channelType').value=c.type;$('channelZone').value=c.zone;$('channelCircuit').value=c.circuit;
+    $('channelColorProfile').value=c.colorProfile;$('channelCustomColor').value=c.customColor;
+    $('customColorRow').style.display=c.colorProfile==='custom'?'block':'none';
+    $('channelBrightness').value=String(Math.round(c.brightness*100));$('channelBrightnessValue').textContent=Math.round(c.brightness*100)+'%';
+    $('channelPhase').max=String(data.stepCount-1);$('channelPhase').value=String(c.phase%data.stepCount);
+    $('channelDialog').showModal();$('channelName').focus();$('channelName').select();
+  }
+  $('addChannelBtn').addEventListener('click',()=>data.channels.length<MAX_CHANNELS&&openDialog());
   $('cancelDialog').addEventListener('click',()=>$('channelDialog').close());
+  $('channelColorProfile').addEventListener('change',()=>{$('customColorRow').style.display=$('channelColorProfile').value==='custom'?'block':'none';});
+  $('channelBrightness').addEventListener('input',e=>$('channelBrightnessValue').textContent=e.target.value+'%');
+  $('channelType').addEventListener('change',e=>{
+    const t=e.target.value;
+    const map={alley:['alley_left','white','Left'],takedown:['takedown','white','Front'],traffic:['traffic','amber','Rear'],scene:['scene','white','Rear'],rear_aux:['warning','redblue','Rear'],grille:['warning','redblue','Front'],underbar:['warning','redbluewhite','Front'],lightbar:['warning','redblue','Roof'],window:['warning','redblue','Interior'],mirror:['warning','redblue','Left'],bumper:['warning','redblue','Front'],running:['warning','redblue','Left']};
+    if(!map[t])return;
+    $('channelCircuit').value=map[t][0];$('channelColorProfile').value=map[t][1];$('channelZone').value=map[t][2];$('customColorRow').style.display='none';
+  });
   $('channelForm').addEventListener('submit',e=>{
     e.preventDefault();
     const label=$('channelName').value.trim(),group=$('channelGroup').value.trim();
-    if(!label||!group){notify('Enter a name and lighting group');return;}
-    if(editingIndex===null) {
-      if(data.channels.length>=MAX_CHANNELS) {notify('Maximum 64 channels');return;}
-      // Keep channels belonging to the same group together in the sequencer.
-      const lastInGroup=data.channels.findLastIndex(c=>c.group.toLowerCase()===group.toLowerCase());
-      const insertAt=lastInGroup<0?data.channels.length:lastInGroup+1;
-      data.channels.splice(insertAt,0,{id:createUniqueId(label),label,group});
-      data.stages.forEach(s=>s.rows.splice(insertAt,0,Array(data.stepCount).fill(null)));
-      notify('Light channel added to all stages');
-    } else {
-      data.channels[editingIndex].label=label;
-      data.channels[editingIndex].group=group;
-      notify('Channel updated');
-    }
+    if(!label||!group){notify('Enter a name and group');return;}
+    const props={label,group,type:$('channelType').value,zone:$('channelZone').value,circuit:$('channelCircuit').value,
+      colorProfile:$('channelColorProfile').value,customColor:$('channelCustomColor').value,
+      brightness:Number($('channelBrightness').value)/100,phase:Number($('channelPhase').value)};
+    checkpoint();
+    if(editIndex===null) {
+      if(data.channels.length>=MAX_CHANNELS){notify('Maximum 128 channels');return;}
+      const last=data.channels.findLastIndex(c=>c.group.toLowerCase()===group.toLowerCase());
+      putChannel(props,last<0?data.channels.length:last+1);notify('Fixture added to all stages');
+    } else {data.channels[editIndex]=enrich({...data.channels[editIndex],...props});notify('Fixture updated');}
     $('channelDialog').close();refresh();save();
-  });
-  $('timeline').addEventListener('click',e=>{
-    const edit=e.target.closest('[data-edit]');
-    if(edit) {openChannelDialog(Number(edit.dataset.edit));return;}
-    const remove=e.target.closest('[data-remove]');
-    if(!remove)return;
-    const i=Number(remove.dataset.remove),c=data.channels[i];
-    if(data.channels.length===1) {notify('At least one channel is required');return;}
-    if(!confirm(`Remove "${c.label}" from all stages? Its programmed steps will be deleted.`))return;
-    data.channels.splice(i,1);data.stages.forEach(s=>s.rows.splice(i,1));refresh();save();notify('Channel removed');
   });
   const asJSON=()=>JSON.stringify(data,null,2);
   $('exportBtn').addEventListener('click',()=>{
-    const base=(data.name||'pattern').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pattern';
+    const name=(data.name||'pattern').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pattern';
     const url=URL.createObjectURL(new Blob([asJSON()],{type:'application/json'}));
-    const a=document.createElement('a');a.href=url;a.download=base+'.els.json';document.body.append(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Pattern exported');
+    const a=document.createElement('a');a.href=url;a.download=name+'.els.json';document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1200);notify('Pattern exported as schema v2');
   });
   $('copyBtn').addEventListener('click',async()=>{
-    try {await navigator.clipboard.writeText(asJSON());notify('Pattern JSON copied');}
-    catch {notify('Clipboard unavailable; use Export pattern');}
+    try{await navigator.clipboard.writeText(asJSON());notify('Pattern JSON copied');}
+    catch{notify('Clipboard unavailable; use Export pattern');}
   });
   $('importFile').addEventListener('change',async e=>{
     const file=e.target.files?.[0];if(!file)return;
-    try {
-      if(file.size>1024*1024)throw Error('File exceeds 1 MB.');
-      const parsed=sanitize(JSON.parse(await file.text()));
-      if(!confirm('Replace the current browser pattern with the imported file? Export a backup first if needed.'))return;
-      data=parsed;activeStage=3;head=0;clock=performance.now();refresh();save();notify('Pattern imported');
-    } catch(error) {notify('Import failed: '+error.message);}
-    finally {e.target.value='';}
+    try {if(file.size>4*1024*1024)throw Error('File exceeds 4 MB');
+      const imported=sanitize(JSON.parse(await file.text()));
+      if(!confirm('Replace your current browser project with this import? Export a backup if needed.'))return;
+      checkpoint();data=imported;manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();notify('Pattern imported');
+    } catch(err) {notify('Import failed: '+err.message);} finally {e.target.value='';}
   });
-  function tick(time) {
-    if(playing) {
-      const next=Math.floor((time-clock)/data.stepMs)%data.stepCount;
-      if(next!==head) {head=next;renderPreview();updateHead();}
-    }
+  function tick(time){if(playing){const next=Math.floor(Math.max(0,time-clock)/data.stepMs)%data.stepCount;
+      if(next!==head){head=next;renderPreview();updateHead();}}
     requestAnimationFrame(tick);
   }
   refresh();save();requestAnimationFrame(tick);
