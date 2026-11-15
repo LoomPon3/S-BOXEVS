@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#111419">
   <meta name="description" content="A visual emergency lighting pattern sequencer for S&box.">
-  <title>ELS Studio v0.5.1 | Vehicle Mapper & Traffic Advisor</title>
+  <title>ELS Studio v0.6 | Unified Editor + Independent Timelines</title>
   <style>
     :root {
       --bg: #0f1216; --surface: #161a1f; --surface-2: #1c2229; --surface-3: #262d35;
@@ -285,6 +285,55 @@
     .ta-swatch{width:9px;height:9px;background:#f4aa37;display:inline-block;vertical-align:middle;margin-right:5px;border-radius:2px}
     @media(max-width:1070px){.map-layout{grid-template-columns:1fr}.map-sidebar{display:grid;grid-template-columns:1fr 1fr}.map-board{min-height:400px}}
     @media(max-width:650px){.map-sidebar{display:flex}.map-layout{padding:10px;gap:10px}.map-board{padding:7px;min-height:unset}.map-marker{width:20px;height:18px;font-size:9px}.ta-field{min-width:calc(50% - 8px)}.ta-field.medium{min-width:100%}}
+
+
+    /* v0.6: unified spatial preview; the redundant fixture rack is gone. */
+    .unified-head{background:#171e24}
+    .map-unified-toolbar{padding:12px 17px;border-bottom:1px solid var(--border-soft);background:#171e23}
+    .map-unified-toolbar .map-controls{gap:7px}
+    .map-unified-toolbar select{height:34px;min-width:140px}
+    .map-unified-toolbar .btn{min-height:34px}
+    .btn-focus{background:#243a43;border-color:#466774;color:#c4e9f1}
+    .btn-focus[aria-pressed=true]{background:#a6d1d9;color:#102126;border-color:#a6d1d9}
+    .unified-panel .map-layout{grid-template-columns:minmax(320px,1fr) minmax(230px,290px);gap:15px;padding:17px}
+    .unified-panel .map-board{min-height:480px;background:radial-gradient(ellipse at center,#26343e 0%,#161d23 70%);border-color:#3e4c58}
+    .unified-panel .map-field{width:min(100%,470px);aspect-ratio:400/500}
+    .unified-panel .map-marker{width:24px;height:21px;transition:box-shadow 70ms ease, background 55ms linear;box-shadow:0 2px 5px #0009}
+    .unified-panel .map-marker.on{box-shadow:0 0 9px var(--light),0 0 22px color-mix(in srgb,var(--light) 60%, transparent),0 0 38px color-mix(in srgb,var(--light) 24%,transparent)}
+    .unified-panel .map-marker.linked:not(.on){border-color:#a6d1d9;background:#314a57}
+    .unified-panel .map-marker.selected{outline:2px solid #d4eef3;outline-offset:2px}
+    .unified-panel .map-info{min-height:182px}
+    .map-focus-surface{display:none;position:absolute;inset:10px;border:1px solid #344a58;border-radius:8px;background:radial-gradient(ellipse at 50% 55%,#283e49,#111a22 73%);pointer-events:none;overflow:hidden}
+    .map-focus-surface:before{content:'';position:absolute;inset:12px;background:repeating-linear-gradient(to right,transparent 0, transparent 38px,#40556220 39px,#40556220 40px);opacity:.4}
+    .map-focus-surface .focus-heading{position:absolute;top:22px;left:0;right:0;text-align:center;color:#bdd3de;text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:740}
+    .map-focus-surface .focus-rail{position:absolute;left:7%;right:7%;top:50%;height:52px;transform:translateY(-50%);border:1px solid #647c8a;background:#1b2933;border-radius:12px;box-shadow:0 0 0 11px #17242b inset}
+    .map-focus-surface .focus-axis{position:absolute;bottom:22px;left:5%;right:5%;color:#7f98a6;font-size:10px;text-align:center;letter-spacing:.08em}
+    .map-field.focused .map-focus-surface{display:block}
+    .map-field.focused .vehicle-outline,.map-field.focused .vehicle-top-label,.map-field.focused .vehicle-bottom-label{display:none}
+    .map-field.focused .map-marker{width:32px;height:27px;font-size:10px}
+    .map-field.focused .map-marker::after{max-width:230px}
+    .unified-modebar{border-top:1px solid var(--border-soft)}
+    .unified-bottom{background:#13191e}
+    @media(max-width:950px){.unified-panel .map-layout{grid-template-columns:1fr}.unified-panel .map-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:10px}.unified-panel .map-legend{grid-column:1/-1}.unified-panel .map-board{min-height:410px}}
+    @media(max-width:580px){.unified-panel .map-layout{padding:9px;gap:10px}.unified-panel .map-sidebar{display:flex}.unified-panel .map-board{min-height:0;padding:5px}.unified-panel .map-field{width:min(100%,400px)}.unified-panel .map-marker{width:21px;height:19px;font-size:8px}.unified-panel .map-unified-toolbar{padding:10px}.unified-panel .map-unified-toolbar select{min-width:110px;max-width:190px}.unified-panel .panel-side{width:auto}}
+
+
+    /* Independent programmable clocks: local channel cycles, not scaled master cells. */
+    :root{--label-width:275px}
+    .clock-settings{margin:0;padding:13px;border:1px solid #384b58;border-radius:7px;background:#141f26;min-width:0}
+    .clock-settings legend{color:#bed8e1;font-size:12px;font-weight:700;padding:0 5px}
+    .clock-settings select{margin:5px 0 0}
+    .timing-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+    .timing-fields .timing-offset{grid-column:1/-1}
+    .timing-fields input{width:100%}
+    .timing-fields.is-disabled{display:none}
+    .clock-settings .helper{font-size:11px;color:#97acb8}
+    .row-clock{font-size:9px;color:#c4e3ec;white-space:nowrap;border:1px solid #507684;border-radius:3px;background:#24424e;padding:2px 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+    .local-cell-row{grid-column:2/-1;display:grid;grid-template-columns:repeat(var(--local-count),minmax(27px,1fr));gap:2px;min-width:calc(var(--local-count)*29px);background:#14222a;border-radius:3px;padding:2px 0}
+    .local-cell-row .cell{min-width:27px;min-height:30px;height:30px}
+    .row-label.is-independent{background:#23343f;border-left:3px solid #8dc7d4}
+    .local-cell-row .cell.active-frame{outline:2px solid #c9f3f8;outline-offset:-2px}
+    @media(max-width:740px){:root{--label-width:190px}.row-clock{font-size:8px;padding:2px}.local-cell-row{grid-template-columns:repeat(var(--local-count),minmax(25px,1fr));min-width:calc(var(--local-count)*27px)}}
   </style>
 </head>
 <body>
@@ -336,7 +385,7 @@
           <a class="btn btn-quiet" style="display:block;text-decoration:none;text-align:center" href="#mappingSection">Manage fixture mappings ↓</a>
           <button id="demoBtn" class="btn btn-quiet" style="width:100%;text-align:center" type="button">Load full vehicle example</button>
         </div>
-        <div class="section-foot">An assembly makes mapped fixtures and pattern channels together. One channel may drive multiple physical lights.</div><a class="nav-jump" href="#vehicleMapSection">Open visual vehicle map ↗</a><a class="nav-jump" href="#trafficSection">Traffic advisor builder ↗</a>
+        <div class="section-foot">An assembly makes mapped fixtures and pattern channels together. One channel may drive multiple physical lights.</div><a class="nav-jump" href="#vehicleMapSection">Open live vehicle editor ↗</a><a class="nav-jump" href="#trafficSection">Traffic advisor builder ↗</a>
       </section>
       <section>
         <div class="eyebrow">Editor tools</div>
@@ -350,16 +399,26 @@
     </aside>
     <main class="main">
       <div class="page-heading">
-        <div><div class="kicker">Pattern editor / Stage <span id="stageIndex">03</span></div><h1 id="pageTitle">Emergency</h1><p class="subhead">Edit the lighting sequence using the timeline below.</p></div>
-        <div class="meta"><span><b id="metaChannels">12</b> channels</span><span><b id="metaFixtures">12</b> fixtures</span><span><b id="metaSteps">16</b> steps</span><span><b id="metaDuration">1.60 s</b> / loop</span></div>
+        <div><div class="kicker">Pattern editor / Stage <span id="stageIndex">03</span></div><h1 id="pageTitle">Emergency</h1><p class="subhead">Edit each light’s flash sequence, timing and location. Independent rows have their own clock.</p></div>
+        <div class="meta"><span><b id="metaChannels">12</b> channels</span><span><b id="metaFixtures">12</b> fixtures</span><span><b id="metaSteps">16</b> steps</span><span><b id="metaDuration">1.60 s</b> master loop</span></div>
       </div>
       <div class="toolbar" aria-label="Channel filters">
         <div class="toolbar-group"><label for="channelSearch">Find fixture</label><input id="channelSearch" type="text" placeholder="Search channel, light or group" spellcheck="false"><select id="zoneFilter" aria-label="Filter location"><option value="all">All locations</option><option>Roof</option><option>Front</option><option>Rear</option><option>Left</option><option>Right</option><option>Interior</option><option>Other</option></select></div>
         <div class="toolbar-group"><span class="mini-stat" id="filterCount">Showing all channels</span><button class="btn btn-quiet" id="clearFilters" type="button">Clear filters</button></div>
       </div>
 
-      <section class="panel" id="vehicleMapSection" aria-label="Visual vehicle fixture mapper">
-        <div class="panel-header"><div><div class="panel-heading">Visual vehicle mapper</div><div class="hint">Select or drag a fixture. Hover for its name, switch on assembly move to reposition linked equipment.</div></div><div class="map-controls"><label for="mapGroupFilter">Show</label><select id="mapGroupFilter" aria-label="Map assembly filter"><option value="all">All assemblies</option></select><label for="mapSnapMode">Snap</label><select id="mapSnapMode" aria-label="Map placement snap mode"><option value="guide">Mount guides</option><option value="free">Free placement</option></select><button class="btn btn-quiet" id="mapMoveAssembly" aria-pressed="false" title="Move every fixture in the same assembly together" type="button">Move assembly: Off</button><button class="btn btn-quiet" id="autoPlaceMap" type="button" title="Reset the shown fixtures to their recommended vehicle positions">Auto arrange</button></div></div>
+      <section class="panel unified-panel" id="vehicleMapSection" aria-label="Live vehicle lighting editor">
+        <div class="panel-header unified-head">
+          <div><div class="panel-heading">Live vehicle editor</div><div class="hint">Position lights and preview their real-time flashes in one place. Select any light to find its pattern channel.</div></div>
+          <div class="panel-side"><span><span class="live-dot"></span> <span id="playState">Playing</span></span><button type="button" class="btn" id="playBtn">Pause</button></div>
+        </div>
+        <div class="map-unified-toolbar">
+          <div class="map-controls"><label for="mapGroupFilter">Show</label><select id="mapGroupFilter" aria-label="Select lighting assembly"><option value="all">All assemblies</option></select>
+          <button class="btn btn-focus" id="mapFocusBtn" type="button" aria-pressed="false" title="Enlarge one selected assembly for precise programming">Focus assembly</button>
+          <label for="mapSnapMode">Position</label><select id="mapSnapMode" aria-label="Map placement mode"><option value="guide">Snap to guides</option><option value="free">Free placement</option></select>
+          <button class="btn btn-quiet" id="mapMoveAssembly" aria-pressed="false" title="Move an entire assembly together" type="button">Move assembly: Off</button>
+          <button class="btn btn-quiet" id="autoPlaceMap" type="button" title="Reposition displayed fixtures using recommended mounting positions">Auto arrange</button></div>
+        </div>
         <div class="map-layout">
           <div class="map-board">
             <div class="map-field" id="mapField" aria-label="Top down vehicle schematic with draggable fixture markers">
@@ -376,24 +435,21 @@
                 <path d="M200 64 V426" stroke="#6b82901c" stroke-dasharray="6 8"/>
               </svg>
               <span class="vehicle-top-label">FRONT</span><span class="vehicle-bottom-label">REAR</span>
+              <div class="map-focus-surface" id="mapFocusSurface" aria-hidden="true"><div class="focus-heading" id="mapFocusName">Assembly focus</div><div class="focus-rail"></div><div class="focus-axis">Front ←  Vehicle assembly  → Rear</div></div>
               <div id="mapMarkers"></div>
             </div>
           </div>
           <div class="map-sidebar">
-            <div class="map-info" id="mapInfo" aria-live="polite"><div class="map-title">Select a fixture</div><div class="map-muted">Click a numbered marker to see its name, assigned channel, and location. Connected fixtures highlight together.</div></div>
-            <div class="map-hint"><strong>Snap: Mount guides</strong> keeps grille, roof, window, and side fixtures aligned as you drag. Select <strong>Free placement</strong> for precise positioning.<div style="margin-top:7px"><strong>Move assembly</strong> moves every fixture sharing a group name, including hidden fixtures. <strong>Auto arrange</strong> resets the visible group to recommended positions.</div><div style="margin-top:7px">Diagram placement is independent of S&box 3D mounting. Double-click a fixture to edit its details.</div></div>
-            <div class="map-legend">Each number represents one physical fixture. Matching channel assignments highlight together. Use <strong>Show</strong> to isolate an assembly when the vehicle has lots of lights.<div class="map-filter-note" id="mapCount">0 fixtures shown</div></div>
+            <div class="map-info" id="mapInfo" aria-live="polite"><div class="map-title">Select a light</div><div class="map-muted">Select any fixture to highlight its pattern channel. Hover to see its name. Drag to position it on the vehicle.</div></div>
+            <div class="map-hint"><strong>One diagram, one preview.</strong> The fixtures flash here while the timeline plays. Select a light and use <strong>Find timeline row</strong> to jump to its sequence.<div style="margin-top:8px"><strong>Focus assembly</strong> enlarges a lightbar or traffic advisor without changing its actual position. <strong>Move assembly</strong> moves its fixtures as a group.</div></div>
+            <div class="map-legend"><strong>Fixture placement</strong> is a visual diagram only. S&amp;box 3D mount coordinates remain separate and unchanged.<div class="map-filter-note" id="mapCount">0 fixtures shown</div></div>
           </div>
         </div>
-      </section>
-      <section class="panel" aria-label="Lighting preview">
-        <div class="panel-header"><span class="panel-heading">Live fixture preview</span><div class="panel-side"><div class="preview-settings"><label for="previewLayout">Layout</label><select id="previewLayout"><option value="zone">Vehicle zones</option><option value="group">Lighting groups</option></select></div><span><span class="live-dot"></span> <span id="playState">Playing</span></span><button type="button" class="btn" id="playBtn">Pause</button></div></div>
-        <div class="preview-body"><div class="preview-rack zoned" id="previewRack"></div></div>
-        <div class="modebar"><div class="modebar-top"><span class="muted-label">Test auxiliary functions</span><span class="hint">Preview-only switches · independent of the current lighting stage</span></div><div class="switch-row" id="functionSwitches"></div></div>
-        <div class="preview-bottom"><div class="playhead-stat"><span id="frameLabel">Step 01 / 16</span><div class="progress"><div class="progress-inner" id="progress"></div></div></div><span style="color:var(--subtle);font-size:11px">Click a light to locate its pattern · Double-click to edit</span></div>
+        <div class="modebar unified-modebar"><div class="modebar-top"><span class="muted-label">Test auxiliary functions</span><span class="hint">Preview-only switches · independent of the emergency stage</span></div><div class="switch-row" id="functionSwitches"></div></div>
+        <div class="preview-bottom unified-bottom"><div class="playhead-stat"><span id="frameLabel">Step 01 / 16</span><div class="progress"><div class="progress-inner" id="progress"></div></div></div><span class="hint">Click to select · Drag to position · Double-click to edit · Focus to zoom into a lightbar</span></div>
       </section>
       <section class="panel" aria-label="Pattern timeline editor">
-        <div class="panel-header"><span class="panel-heading">Sequence timeline</span><div class="panel-side"><span>Drag to paint · Right-click to erase · Click a channel name to edit</span></div></div>
+        <div class="panel-header"><div><span class="panel-heading">Sequence timeline</span><div class="hint">Each row is independently editable. <strong>⏱ Own clock</strong> rows can run at a different speed and length from the master.</div></div><div class="panel-side"><span>Drag to paint · Right-click to erase · Click a channel name to edit timing</span></div></div>
         <div class="editor-controls">
           <div class="brush-area" role="group" aria-label="Color selection">
             <span class="muted-label">Paint</span>
@@ -436,7 +492,7 @@
         <div id="mappingRows" class="mapping-list"></div>
         <div class="mapping-footer">Pattern channels hold timing. Fixtures hold optics, utility circuit, mounting information and model reference. All of these export in JSON.</div>
       </section>
-      <div class="info-footer"><span><strong>ELS Studio</strong> · Browser-based sequence designer</span><span>JSON schema v4 · 128 channels · 256 fixtures · Visual map · Traffic programs</span></div>
+      <div class="info-footer"><span><strong>ELS Studio</strong> · Browser-based sequence designer</span><span>JSON schema v5 · 128 channels · 256 fixtures · Unified live vehicle editor · Independent clocks · Traffic programs</span></div>
     </main>
   </div>
 </div>
@@ -493,7 +549,17 @@
     <div class="dialog-body">
       <div><label class="field-label" for="patternChannelName">Channel name</label><input type="text" id="patternChannelName" required maxlength="60" placeholder="e.g. Driver grille flash A"></div>
       <div><label class="field-label" for="patternChannelGroup">Timeline group</label><input type="text" id="patternChannelGroup" required maxlength="36" placeholder="e.g. Grille"></div>
-      <div class="notice">A channel is one editable timing row. Assign it to one or more physical fixtures in the mapping panel. Rename it freely: its stable ID won't change.</div>
+      <fieldset class="clock-settings"><legend>Channel timing</legend>
+        <label class="field-label" for="patternClockMode">Timeline clock</label>
+        <select id="patternClockMode"><option value="master">Master clock (normal)</option><option value="independent">Independent clock</option></select>
+        <div class="timing-fields" id="timingFields">
+          <div><label class="field-label" for="patternLocalMs">Time per step</label><select id="patternLocalMs"><option value="25">25 ms</option><option value="50">50 ms</option><option value="75">75 ms</option><option value="100">100 ms</option><option value="125">125 ms</option><option value="150">150 ms</option><option value="200">200 ms</option><option value="250">250 ms</option><option value="500">500 ms</option></select></div>
+          <div><label class="field-label" for="patternLocalSteps">Loop length</label><select id="patternLocalSteps"><option>8</option><option>16</option><option>24</option><option>32</option><option>48</option><option>64</option></select></div>
+          <div class="timing-offset"><label class="field-label" for="patternOffsetMs">Phase shift (ms)</label><input type="number" id="patternOffsetMs" min="-10000" max="10000" step="25" value="0"><div class="helper">Positive values advance this channel; negative values delay it.</div></div>
+        </div>
+        <div class="helper" id="patternClockHelp">Uses the master timeline's step duration and loop.</div>
+      </fieldset>
+      <div class="notice">For out-of-sync pushbar lights, give each light its own pattern channel, choose Independent clock, and paint its own sequence. Several fixtures on one channel intentionally share the same sequence.</div>
     </div>
     <div class="dialog-actions"><button type="button" class="btn btn-quiet" id="cancelPattern">Cancel</button><button class="btn btn-strong" type="submit" id="savePattern">Save channel</button></div>
   </form>
@@ -503,7 +569,7 @@
 (() => {
   'use strict';
   const MAX_CHANNELS=128, MAX_FIXTURES=256;
-  const NEW_KEY='sbox-els-studio-v05', OLD_KEY='sbox-els-studio-v04', LEGACY_KEY='sbox-els-studio-v01';
+  const NEW_KEY='sbox-els-studio-v06', OLD_KEY='sbox-els-studio-v05', OLDER_KEY='sbox-els-studio-v04', LEGACY_KEY='sbox-els-studio-v01';
   const COLORS={red:'#ff4059',blue:'#338aff',amber:'#ffad34',white:'#f9fbff',green:'#65ddaa'};
   const STEP_CHOICES=[25,50,75,100,125,150,200,250,500], COUNT_CHOICES=[8,16,24,32,48,64];
   const STAGES=[{id:1,name:'Cruise',brightness:.3},{id:2,name:'Warning',brightness:.7},{id:3,name:'Emergency',brightness:1}];
@@ -555,14 +621,23 @@
     if(/bumper/.test(g))return {type:'bumper',zone:/rear/.test(g)?'Rear':'Front',circuit:'warning',colorProfile:'redblue'};
     return {type:'other',zone:'Other',circuit:'warning',colorProfile:'any'};
   };
-  const newProject=(name='Untitled Pattern')=>({format:'sbox-els-pattern',version:4,name,stepMs:100,stepCount:16,trafficDirection:'right',channels:[],fixtures:[],trafficAdvisors:[],stages:STAGES.map(s=>({...s,rows:[]}))});
+  const newProject=(name='Untitled Pattern')=>({format:'sbox-els-pattern',version:5,name,stepMs:100,stepCount:16,trafficDirection:'right',channels:[],fixtures:[],trafficAdvisors:[],stages:STAGES.map(s=>({...s,rows:[]}))});
   const defMount=()=>({anchor:'vehicle',socket:'',position:[0,0,0],rotation:[0,0,0]});
   const baseFixture=(c={})=>({id:clean(c.id,100),label:clean(c.label,60,'Unnamed fixture'),group:clean(c.group,36,'Custom'),type:TYPES.some(t=>t[0]===c.type)?c.type:'other',zone:ZONES.includes(c.zone)?c.zone:'Other',circuit:CIRCUITS.some(t=>t[0]===c.circuit)?c.circuit:'warning',colorProfile:Object.hasOwn(PROFILES,c.colorProfile)||c.colorProfile==='custom'?c.colorProfile:'any',customColor:isHex(c.customColor)?c.customColor.toLowerCase():'#bc8cff',brightness:clamp(c.brightness,.05,1,1),phase:Math.round(clamp(c.phase,0,63,0)),colorMode:c.colorMode==='fixed'?'fixed':'timeline',channelId:clean(c.channelId,100),asset:clean(c.asset,240),taOrder:Math.round(clamp(c.taOrder,0,256,0)),map:c.map&&Number.isFinite(Number(c.map.x))&&Number.isFinite(Number(c.map.y))?{x:Math.round(clamp(c.map.x,3,97,50)*10)/10,y:Math.round(clamp(c.map.y,4,96,50)*10)/10}:null,mount:{anchor:'vehicle',socket:clean(c.mount?.socket,100),position:[0,1,2].map(i=>clamp(c.mount?.position?.[i],-100000,100000,0)),rotation:[0,1,2].map(i=>clamp(c.mount?.rotation?.[i],-360000,360000,0))}});
-  let data=newProject(),activeStage=3,brush=COLORS.red,playing=true,head=0,clock=performance.now(),prevHead=-1,drag=false,dragTouched=false,dragColor=null,editFixture=null,editChannel=null,previewLayout='zone';
-  let previews=[],mapPreviews=[],collapsed=new Set(),manual=new Set(),undo=[],redo=[],toastTimer;
-  let selectedFixtureId=null,mapGroupSelection='all',trafficGroupSelection='',trafficModeSelection='right',mapDrag=null,moveAssemblyMode=false;
+  let data=newProject(),activeStage=3,brush=COLORS.red,playing=true,head=0,clock=performance.now(),prevHead=-1,drag=false,dragTouched=false,dragColor=null,editFixture=null,editChannel=null;
+  let mapPreviews=[],collapsed=new Set(),manual=new Set(),undo=[],redo=[],toastTimer;
+  let selectedFixtureId=null,mapGroupSelection='all',trafficGroupSelection='',trafficModeSelection='right',mapDrag=null,moveAssemblyMode=false,focusAssemblyMode=false,oldMapGroup='all',mapFocusZoom={x:50,y:50,scale:1};
   let elapsedWhenPaused=0,lastTATick=-1;
   const stage=()=>data.stages[activeStage-1];
+  const clockIsIndependent=c=>c?.timing?.mode==='independent';
+  const channelRows=(r,stageIndex=activeStage-1)=>clockIsIndependent(data.channels[r])?data.channels[r].localRows[stageIndex]:data.stages[stageIndex].rows[r];
+  const channelStepMs=c=>clockIsIndependent(c)?c.timing.stepMs:data.stepMs;
+  const channelStepCount=c=>clockIsIndependent(c)?c.timing.stepCount:data.stepCount;
+  const channelStepAt=(c,elapsed,extraPhase=0)=>Math.floor((Math.max(0,elapsed)+(clockIsIndependent(c)?c.timing.offsetMs:0))/channelStepMs(c)+extraPhase+1000000*channelStepCount(c))%channelStepCount(c);
+  const elapsedTime=()=>Math.max(0,playing?performance.now()-clock:elapsedWhenPaused);
+  const remapCells=(oldCells,oldMs,newCount,newMs)=>Array.from({length:newCount},(_,t)=>oldCells[Math.floor(t*newMs/oldMs)%oldCells.length]||null);
+  function independentlyProgrammed(c){return clockIsIndependent(c)&&Array.isArray(c.localRows)&&c.localRows.length===3;}
+  function lastChannelStep(c){return channelStepAt(c,elapsedTime());}
   const indexOfChannel=id=>data.channels.findIndex(c=>c.id===id);
   const fixtureForChannel=id=>data.fixtures.filter(f=>f.channelId===id);
   const allowed=f=>f.colorProfile==='custom'?[f.customColor]:(PROFILES[f.colorProfile]||null);
@@ -574,7 +649,7 @@
   function history(){undo.push(JSON.stringify(data));if(undo.length>75)undo.shift();redo.length=0;updateHistory();}
   function updateHistory(){$('undoBtn').disabled=!undo.length;$('redoBtn').disabled=!redo.length;}
   function restore(from,to){if(!from.length)return;to.push(JSON.stringify(data));data=validate(JSON.parse(from.pop()));collapsed.clear();resetClock();refresh();save();updateHistory();}
-  function resetClock(){head=0;prevHead=-1;lastTATick=-1;elapsedWhenPaused=0;clock=performance.now();}
+  function resetClock(){head=0;prevHead=-1;lastTATick=-1;lastIndependentTicks='';elapsedWhenPaused=0;clock=performance.now();}
   // Recommended 2D mount tracks correspond to the top-down SUV schematic.
   // Tracks affect only diagram positions, never a physical mount in S&box.
   function mapMountTrack(f){
@@ -662,16 +737,33 @@
     for(const group of names){if(!trafficConfig(group))data.trafficAdvisors.push(makeTrafficConfig(group));}
     if(!names.has(trafficGroupSelection))trafficGroupSelection=names.values().next().value||'';
   }
-  function createChannel(label,group='Custom',index=data.channels.length,rows=null){if(data.channels.length>=MAX_CHANNELS)throw Error('Maximum 128 channels');const id=unique(label,new Set(data.channels.map(c=>c.id)));const c={id,label:clean(label,60,'Channel'),group:clean(group,36,'Custom')};data.channels.splice(index,0,c);data.stages.forEach((s,i)=>s.rows.splice(index,0,rows?.[i]?.slice()||Array(data.stepCount).fill(null)));return c;}
+  function createChannel(label,group='Custom',index=data.channels.length,rows=null){if(data.channels.length>=MAX_CHANNELS)throw Error('Maximum 128 channels');const id=unique(label,new Set(data.channels.map(c=>c.id)));const c={id,label:clean(label,60,'Channel'),group:clean(group,36,'Custom'),timing:{mode:'master',stepMs:data.stepMs,stepCount:data.stepCount,offsetMs:0},localRows:null};data.channels.splice(index,0,c);data.stages.forEach((s,i)=>s.rows.splice(index,0,rows?.[i]?.slice()||Array(data.stepCount).fill(null)));return c;}
   function createFixture(props){if(data.fixtures.length>=MAX_FIXTURES)throw Error('Maximum 256 physical fixtures');const f=baseFixture({...props,id:unique(props.label,new Set(data.fixtures.map(f=>f.id)))});if(indexOfChannel(f.channelId)<0)throw Error('Assign an existing channel first');if(!f.map)f.map=autoMapSpot(f,data.fixtures.filter(x=>x.group===f.group&&x.zone===f.zone).length,8);data.fixtures.push(f);return f;}
   function addAssembly(template){for(let i=0;i<template.names.length;i++){const label=template.group+' · '+template.names[i],c=createChannel(label,template.group);createFixture({label,group:template.group,type:template.type,zone:template.zones?.[i]||template.zone||'Other',circuit:template.circuits?.[i]||template.circuit||'warning',colorProfile:template.colorProfile,channelId:c.id,colorMode:'timeline',taOrder:template.type==='traffic'?i+1:0,map:autoMapSpot({group:template.group,zone:template.zones?.[i]||template.zone||'Other',circuit:template.circuits?.[i]||template.circuit||'warning',type:template.type},i,template.names.length)});}}
   function newDemo(){data=newProject('Complete vehicle example');DEMO.forEach(k=>addAssembly(TEMPLATES.find(t=>t.key===k)));data.channels.forEach((c,r)=>{const f=fixtureForChannel(c.id)[0];if(!f||f.circuit!=='warning')return;for(let t=0;t<data.stepCount;t++){const color=suggestColor(c,r);if((t<8)===(r%2===0))data.stages[1].rows[r][t]=color;const flash=t%8===0||t%8===2;if(flash===(((Math.floor(t/8)%2)===0)===(r%2===0)))data.stages[2].rows[r][t]=color;}});ensureTrafficPrograms();return data;}
   function validate(raw){
-    if(!raw||raw.format!=='sbox-els-pattern'||![1,2,3,4].includes(raw.version)||!Array.isArray(raw.channels)||!Array.isArray(raw.stages))throw Error('Not a supported ELS pattern file.');
+    if(!raw||raw.format!=='sbox-els-pattern'||![1,2,3,4,5].includes(raw.version)||!Array.isArray(raw.channels)||!Array.isArray(raw.stages))throw Error('Not a supported ELS pattern file.');
     if(!STEP_CHOICES.includes(raw.stepMs)||!COUNT_CHOICES.includes(raw.stepCount))throw Error('Unsupported step duration or count.');
     if(raw.channels.length>MAX_CHANNELS||raw.stages.length!==3)throw Error('Too many channels or invalid stages.');
     const chIds=new Set();
-    const channels=raw.channels.map(c=>{if(!c||typeof c.id!=='string'||typeof c.label!=='string'||typeof c.group!=='string')throw Error('Invalid channel.');const id=clean(c.id,100),label=clean(c.label,60),group=clean(c.group,36);if(!id||!label||!group||chIds.has(id)||c.id.trim().length>100)throw Error('Duplicate or invalid channel ID.');chIds.add(id);return {id,label,group};});
+    const channels=raw.channels.map((c,i)=>{
+      if(!c||typeof c.id!=='string'||typeof c.label!=='string'||typeof c.group!=='string')throw Error('Invalid channel.');
+      const id=clean(c.id,100),label=clean(c.label,60),group=clean(c.group,36);
+      if(!id||!label||!group||chIds.has(id)||c.id.trim().length>100)throw Error('Duplicate or invalid channel ID.');chIds.add(id);
+      const ind=raw.version===5&&c.timing?.mode==='independent';
+      const timeMs=STEP_CHOICES.includes(c.timing?.stepMs)?c.timing.stepMs:raw.stepMs;
+      const steps=COUNT_CHOICES.includes(c.timing?.stepCount)?c.timing.stepCount:raw.stepCount;
+      const timing={mode:ind?'independent':'master',stepMs:timeMs,stepCount:steps,offsetMs:Math.round(clamp(c.timing?.offsetMs,-10000,10000,0))};
+      let localRows=null;
+      if(ind){
+        if(!Array.isArray(c.localRows)||c.localRows.length!==3)throw Error('Independent channel '+label+' is missing its sequences.');
+        localRows=c.localRows.map(row=>{
+          if(!Array.isArray(row)||row.length!==steps||row.some(v=>v!==null&&!isHex(v)))throw Error('Invalid local timeline for '+label);
+          return row.map(v=>v===null?null:v.toLowerCase());
+        });
+      }
+      return {id,label,group,timing,localRows};
+    });
     const stages=STAGES.map((def,i)=>{const s=raw.stages[i];if(!s||s.id!==def.id||!Array.isArray(s.rows)||s.rows.length!==channels.length)throw Error('Stage rows do not match channel list.');const rows=s.rows.map(row=>{if(!Array.isArray(row)||row.length!==raw.stepCount||row.some(v=>v!==null&&!isHex(v)))throw Error('Invalid timeline cell.');return row.map(v=>v===null?null:v.toLowerCase());});return {...def,brightness:clamp(s.brightness,.1,1,def.brightness),rows};});
     let fixtures=[];
     if(raw.version<=2){
@@ -683,7 +775,7 @@
     }
     positionMissingFixtures(fixtures);
     let trafficAdvisors=[];
-    if(raw.version===4&&Array.isArray(raw.trafficAdvisors)){
+    if(raw.version>=4&&Array.isArray(raw.trafficAdvisors)){
       const accepted=new Set(),byGroup=grouping(fixtures.filter(f=>f.circuit==='traffic'),f=>f.group);
       raw.trafficAdvisors.slice(0,MAX_FIXTURES).forEach(p=>{
         if(!p||typeof p.group!=='string'||!byGroup.has(p.group)||accepted.has(p.group))return;
@@ -697,14 +789,14 @@
       });
     }
     let name=clean(raw.name,64,'Untitled Pattern');if(name.toLowerCase()==='osprey response 01')name='Untitled Pattern';
-    return {format:'sbox-els-pattern',version:4,name,stepMs:raw.stepMs,stepCount:raw.stepCount,trafficDirection:TA_MODES.includes(raw.trafficDirection)?raw.trafficDirection:'right',channels,fixtures,trafficAdvisors,stages};
+    return {format:'sbox-els-pattern',version:5,name,stepMs:raw.stepMs,stepCount:raw.stepCount,trafficDirection:TA_MODES.includes(raw.trafficDirection)?raw.trafficDirection:'right',channels,fixtures,trafficAdvisors,stages};
   }
-  try {const raw=localStorage.getItem(NEW_KEY)||localStorage.getItem(OLD_KEY)||localStorage.getItem(LEGACY_KEY);data=raw?validate(JSON.parse(raw)):newDemo();}catch(err){console.warn(err);data=newDemo();toast('Saved project could not be loaded; use Import JSON if you have a backup.');}
+  try {const raw=localStorage.getItem(NEW_KEY)||localStorage.getItem(OLD_KEY)||localStorage.getItem(OLDER_KEY)||localStorage.getItem(LEGACY_KEY);data=raw?validate(JSON.parse(raw)):newDemo();}catch(err){console.warn(err);data=newDemo();toast('Saved project could not be loaded; use Import JSON if you have a backup.');}
   const matching=(vals,q)=>!q||vals.some(v=>String(v||'').toLowerCase().includes(q));
   function visibleChannels(){const q=$('channelSearch').value.trim().toLowerCase(),zone=$('zoneFilter').value,programmed=$('showOnlyProgrammed').checked;
-    return data.channels.map((c,i)=>({c,i})).filter(({c,i})=>{const f=fixtureForChannel(c.id);return (zone==='all'||f.some(x=>x.zone===zone))&&matching([c.label,c.group,...f.flatMap(x=>[x.label,x.group,x.type,x.zone,x.circuit])],q)&&(!programmed||stage().rows[i].some(Boolean));});}
+    return data.channels.map((c,i)=>({c,i})).filter(({c,i})=>{const f=fixtureForChannel(c.id);return (zone==='all'||f.some(x=>x.zone===zone))&&matching([c.label,c.group,...f.flatMap(x=>[x.label,x.group,x.type,x.zone,x.circuit])],q)&&(!programmed||channelRows(i).some(Boolean));});}
   function visibleFixtures(){const q=$('channelSearch').value.trim().toLowerCase(),zone=$('zoneFilter').value,programmed=$('showOnlyProgrammed').checked;
-    return data.fixtures.map((f,i)=>({f,i})).filter(({f})=>{const ch=data.channels[indexOfChannel(f.channelId)];return (zone==='all'||f.zone===zone)&&matching([f.label,f.group,f.type,f.zone,f.circuit,ch?.label,ch?.group],q)&&(!programmed||(indexOfChannel(f.channelId)>=0&&stage().rows[indexOfChannel(f.channelId)].some(Boolean)));});}
+    return data.fixtures.map((f,i)=>({f,i})).filter(({f})=>{const ch=data.channels[indexOfChannel(f.channelId)];return (zone==='all'||f.zone===zone)&&matching([f.label,f.group,f.type,f.zone,f.circuit,ch?.label,ch?.group],q)&&(!programmed||(indexOfChannel(f.channelId)>=0&&channelRows(indexOfChannel(f.channelId)).some(Boolean)));});}
   function grouping(items,fn){const out=new Map();items.forEach(x=>{const k=fn(x);if(!out.has(k))out.set(k,[]);out.get(k).push(x);});return out;}
   function updateMeta(){
     $('patternName').value=data.name;$('stepMs').value=String(data.stepMs);$('stepCount').value=String(data.stepCount);
@@ -713,7 +805,7 @@
     $('metaChannels').textContent=data.channels.length;$('metaFixtures').textContent=data.fixtures.length;$('metaSteps').textContent=data.stepCount;$('metaDuration').textContent=(data.stepCount*data.stepMs/1000).toFixed(2)+' s';
     $('brightness').value=String(Math.round(stage().brightness*100));$('brightnessDisplay').textContent=Math.round(stage().brightness*100)+'%';
     $('stageIndex').textContent=String(activeStage).padStart(2,'0');$('pageTitle').textContent=stage().name;
-    $('editorStatus').textContent=`Stage ${activeStage} · ${data.channels.length} channels · ${data.fixtures.length} fixtures`;
+    $('editorStatus').textContent=`Stage ${activeStage} · ${data.channels.filter(clockIsIndependent).length} independent clocks · ${data.channels.length} channels`;
     $('filterCount').textContent=`Showing ${visibleChannels().length}/${data.channels.length} channels · ${visibleFixtures().length}/${data.fixtures.length} fixtures`;
     document.querySelectorAll('.stage-btn').forEach(btn=>{const active=Number(btn.dataset.stage)===activeStage;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',active?'true':'false');});
   }
@@ -726,35 +818,68 @@
       return at.includes(f.id)?defaultColor(f):null;
     }
     if(manual.has(f.circuit)&&f.circuit!=='warning')return defaultColor(f);
-    const cell=stage().rows[r][(t+f.phase)%data.stepCount];if(!cell)return null;
+    const c=data.channels[r],cell=channelRows(r)[clockIsIndependent(c)?channelStepAt(c,elapsedTime(),f.phase):(t+f.phase)%data.stepCount];if(!cell)return null;
     if(f.colorMode==='fixed')return defaultColor(f);
     const limited=allowed(f);return limited&&!limited.includes(cell)?null:cell;
   }
-  function renderPreviewRack(){previews=[];$('previewRack').replaceChildren();$('previewRack').classList.toggle('zoned',previewLayout==='zone');
-    const list=visibleFixtures(),by=grouping(list,x=>previewLayout==='zone'?x.f.zone:x.f.group),order=previewLayout==='zone'?ZONES:[...by.keys()];
-    order.forEach(name=>{const group=by.get(name);if(!group?.length)return;const section=txt('section','rack-section');if(previewLayout==='zone')section.dataset.zone=name;
-      const h=txt('div','rack-header'),title=txt('span','',name),count=txt('span','',`${group.length} fixtures`);h.append(title,count);const rack=txt('div','rack');
-      group.forEach(({f,i})=>{const b=txt('button','lamp');b.type='button';b.dataset.fixture=i;b.dataset.fixtureId=f.id;const c=data.channels[indexOfChannel(f.channelId)];b.title=`${f.label}\nPattern: ${c?.label||'missing'}\n${f.zone} · ${f.circuit}\nMount: ${f.mount.socket||'vehicle root'}`;b.setAttribute('aria-label',`${f.label} fixture, edit mount and channel`);
-        b.append(txt('span','lamp-number',String(i+1).padStart(2,'0')),txt('span','lamp-name',f.label.split(' · ').at(-1)));rack.append(b);previews[i]=b;});section.append(h,rack);$('previewRack').append(section);});
-    if(!list.length)$('previewRack').append(txt('div','empty-state','No fixtures match these filters.'));
-    renderPreview();}
-  function renderPreview(){previews.forEach((lamp,i)=>{if(!lamp)return;const f=data.fixtures[i],color=lightAt(f,head);lamp.classList.toggle('on',Boolean(color));
-      if(color){lamp.style.setProperty('--light',color);lamp.style.opacity=String(Math.min(1,.50+(manual.has(f.circuit)?1:stage().brightness)*f.brightness*.5));}else{lamp.style.removeProperty('--light');lamp.style.opacity='1';}});
-    mapPreviews.forEach((marker,i)=>{if(!marker)return;const f=data.fixtures[i],color=lightAt(f,head);marker.classList.toggle('on',!!color);if(color)marker.style.setProperty('--light',color);else marker.style.removeProperty('--light');});
-    $('frameLabel').textContent=`Step ${String(head+1).padStart(2,'0')} / ${data.stepCount}`;$('progress').style.width=`${(head+1)*100/data.stepCount}%`;}
+  function renderPreview(){
+    mapPreviews.forEach((marker,i)=>{
+      if(!marker)return;
+      const f=data.fixtures[i],color=lightAt(f,head);
+      marker.classList.toggle('on',Boolean(color));
+      if(color){marker.style.setProperty('--light',color);marker.style.opacity=String(Math.min(1,.55+f.brightness*(manual.has(f.circuit)?1:stage().brightness)*.45));}
+      else{marker.style.removeProperty('--light');marker.style.opacity='1';}
+    });
+    $('frameLabel').textContent=`Step ${String(head+1).padStart(2,'0')} / ${data.stepCount}`;
+    $('progress').style.width=`${(head+1)*100/data.stepCount}%`;
+  }
   function styleCell(el,color){el.classList.toggle('on',!!color);if(color)el.style.setProperty('--cell',color);else el.style.removeProperty('--cell');}
-  function renderTimeline(){const grid=$('timeline');grid.replaceChildren();grid.style.setProperty('--steps',data.stepCount);grid.append(txt('div','heading first','Pattern channel / time'));
-    for(let t=0;t<data.stepCount;t++){const h=txt('div','heading',String(t+1).padStart(2,'0'));h.dataset.head=t;h.title=`${t*data.stepMs} ms`;grid.append(h);}
-    const g=grouping(visibleChannels(),x=>x.c.group);g.forEach((items,group)=>{const hd=txt('div','group-heading'),toggle=txt('button','group-toggle',`${collapsed.has(group)?'▸':'▾'} ${group} · ${items.length}`);toggle.type='button';toggle.dataset.collapse=group;toggle.setAttribute('aria-expanded',String(!collapsed.has(group)));hd.append(toggle);grid.append(hd);if(collapsed.has(group))return;
-      items.forEach(({c,i})=>{const row=txt('div','row-label'),num=fixtureForChannel(c.id).length;const name=txt('button','row-name',c.label);name.dataset.editChannel=i;name.title=`Edit channel ${c.label}`;const count=txt('span','row-index',`${num}×`);count.title=`${num} physical lights assigned`;
-        const locate=txt('button','row-action locate-btn','◎');locate.type='button';locate.dataset.findChannel=c.id;locate.title='Locate connected fixture on vehicle map';
-        const dupe=txt('button','row-action','⧉');dupe.type='button';dupe.title='Duplicate channel and sequence (no physical fixture)';dupe.dataset.duplicate=i;
+  function renderTimeline(){
+    const grid=$('timeline');grid.replaceChildren();grid.style.setProperty('--steps',data.stepCount);
+    grid.append(txt('div','heading first','Pattern channel / master time'));
+    for(let t=0;t<data.stepCount;t++){
+      const h=txt('div','heading',String(t+1).padStart(2,'0'));h.dataset.head=t;h.title=`Master: ${t*data.stepMs} ms`;grid.append(h);
+    }
+    const g=grouping(visibleChannels(),x=>x.c.group);
+    g.forEach((items,group)=>{
+      const hd=txt('div','group-heading'),toggle=txt('button','group-toggle',`${collapsed.has(group)?'▸':'▾'} ${group} · ${items.length}`);toggle.type='button';toggle.dataset.collapse=group;toggle.setAttribute('aria-expanded',String(!collapsed.has(group)));hd.append(toggle);grid.append(hd);
+      if(collapsed.has(group))return;
+      items.forEach(({c,i})=>{
+        const own=clockIsIndependent(c),row=txt('div','row-label'+(own?' is-independent':'')),num=fixtureForChannel(c.id).length;
+        const name=txt('button','row-name',c.label);name.dataset.editChannel=i;name.title=`Edit channel and timing: ${c.label}`;
+        const count=txt('span','row-index',`${num}×`);count.title=`${num} physical lights assigned`;
+        const locate=txt('button','row-action locate-btn','◎');locate.type='button';locate.dataset.findChannel=c.id;locate.title='Locate connected fixture on the vehicle';
+        const dupe=txt('button','row-action','⧉');dupe.type='button';dupe.dataset.duplicate=i;dupe.title='Duplicate channel, sequence and timing (no physical fixture)';
         const clear=txt('button','row-action','⌫');clear.type='button';clear.title='Clear current stage row';clear.dataset.clear=i;
         const remove=txt('button','remove-row','×');remove.type='button';remove.title='Delete channel only if unmapped';remove.dataset.remove=i;
-        row.dataset.channelId=c.id;row.append(name,count,locate,dupe,clear,remove);grid.append(row);
-        stage().rows[i].forEach((color,t)=>{const cell=txt('button','cell');cell.type='button';cell.dataset.r=i;cell.dataset.t=t;cell.title=`${c.label} · ${t*data.stepMs} ms · ${colorName(color)}`;cell.setAttribute('aria-label',`${c.label}, step ${t+1}: ${colorName(color)}`);cell.dataset.channelId=c.id;styleCell(cell,color);grid.append(cell);});
-      });});if(!g.size)grid.append(txt('div','empty-state','No channels match these filters.'));prevHead=-1;updateHead();syncSelection();}
-  function updateHead(){if(prevHead===head)return;for(const t of [prevHead,head]){if(t<0)continue;$('timeline').querySelectorAll(`[data-head="${t}"]`).forEach(el=>el.classList.toggle('play-head',t===head));$('timeline').querySelectorAll(`.cell[data-t="${t}"]`).forEach(el=>el.classList.toggle('active-frame',t===head));}prevHead=head;}
+        row.dataset.channelId=c.id;row.append(name);
+        if(own){const tag=txt('span','row-clock',`⏱ ${c.timing.stepMs}ms × ${c.timing.stepCount}`);tag.title=`Independent ${c.timing.stepCount}-step loop · ${c.timing.stepMs} ms per step · ${c.timing.offsetMs} ms phase. Click name to change.`;row.append(tag);}
+        row.append(count,locate,dupe,clear,remove);grid.append(row);
+        let root=grid;
+        if(own){root=txt('div','local-cell-row');root.style.setProperty('--local-count',c.timing.stepCount);root.dataset.localChannel=c.id;root.title=`Independent clock: ${c.timing.stepMs} ms × ${c.timing.stepCount}. Unlike the master header, these are this channel's own steps.`;grid.append(root);}
+        channelRows(i).forEach((color,t)=>{
+          const cell=txt('button','cell');cell.type='button';cell.dataset.r=i;cell.dataset.t=t;cell.dataset.channelId=c.id;
+          if(own)cell.dataset.independent='true';
+          cell.title=`${c.label} · ${t*channelStepMs(c)} ms on ${own?'independent':'master'} loop · ${colorName(color)}`;
+          cell.setAttribute('aria-label',`${c.label}, ${own?'local':'master'} step ${t+1}: ${colorName(color)}`);styleCell(cell,color);root.append(cell);
+        });
+      });
+    });
+    if(!g.size)grid.append(txt('div','empty-state','No channels match these filters.'));
+    prevHead=-1;updateHead();updateIndependentHeads();syncSelection();
+  }
+  function updateHead(){if(prevHead===head)return;for(const t of [prevHead,head]){if(t<0)continue;$('timeline').querySelectorAll(`[data-head="${t}"]`).forEach(el=>el.classList.toggle('play-head',t===head));$('timeline').querySelectorAll(`:scope > .cell[data-t="${t}"]`).forEach(el=>el.classList.toggle('active-frame',t===head));}prevHead=head;}
+  function updateIndependentHeads(){
+    const elapsed=elapsedTime();
+    $('timeline').querySelectorAll('[data-local-channel]').forEach(wrapper=>{
+      const c=data.channels.find(c=>c.id===wrapper.dataset.localChannel);if(!c)return;
+      const current=channelStepAt(c,elapsed);
+      const last=Number(wrapper.dataset.lastStep??-1);
+      if(last===current)return;
+      if(last>=0)wrapper.children[last]?.classList.remove('active-frame');
+      wrapper.children[current]?.classList.add('active-frame');wrapper.dataset.lastStep=String(current);
+    });
+  }
   function renderSwitches(){const root=$('functionSwitches');root.replaceChildren();CIRCUITS.filter(c=>c[0]!=='warning').forEach(([id,label])=>{const n=data.fixtures.filter(f=>f.circuit===id).length,btn=txt('button','mode-switch',`${label} (${n})`);btn.type='button';btn.dataset.manual=id;btn.setAttribute('aria-pressed',String(manual.has(id)));btn.disabled=!n;root.append(btn);});const sel=txt('select');sel.id='trafficDirection';sel.title='Traffic advisor test direction';sel.setAttribute('aria-label','Traffic advisor direction');[['right','Sweep right'],['left','Sweep left'],['center','Center-out'],['inward','Outside-in'],['alternate','Alternating']].forEach(([id,label])=>{const opt=txt('option','',label);opt.value=id;sel.append(opt);});sel.value=data.trafficDirection;root.append(sel);}
   function renderMappings(){const root=$('mappingRows');root.replaceChildren();$('mapChannelsCount').textContent=`${data.channels.length} channels`;$('mapFixturesCount').textContent=`${data.fixtures.length} fixtures`;$('mapSharedCount').textContent=`${data.channels.filter(c=>fixtureForChannel(c.id).length>1).length} shared channels`;
     const query=$('mapSearch').value.trim().toLowerCase();const list=data.fixtures.map((f,i)=>({f,i})).filter(({f})=>{const c=data.channels[indexOfChannel(f.channelId)];return matching([f.label,f.group,f.type,f.zone,f.circuit,c?.label,c?.group,f.mount.socket,f.asset],query);});
@@ -767,7 +892,7 @@
   }
   function syncSelection(){
     const f=data.fixtures.find(f=>f.id===selectedFixtureId),c=f?.channelId;
-    document.querySelectorAll('.map-marker,.lamp,.mapping-row').forEach(el=>{
+    document.querySelectorAll('.map-marker,.mapping-row').forEach(el=>{
       const id=el.dataset.fixtureId||el.dataset.mappingId;
       const connected=c&&data.fixtures.find(x=>x.id===id)?.channelId===c;
       el.classList.toggle('selected',!!f&&id===f.id);
@@ -792,11 +917,29 @@
       $('vehicleMapSection').scrollIntoView({behavior:'smooth',block:'start'});
     }
   }
+  function mapViewPosition(position){
+    return focusAssemblyMode?{x:50+(position.x-mapFocusZoom.x)*mapFocusZoom.scale,y:50+(position.y-mapFocusZoom.y)*mapFocusZoom.scale}:position;
+  }
+  function updateMapFocus(){
+    const field=$('mapField'),focus=$('mapFocusBtn');
+    let items=focusAssemblyMode?data.fixtures.filter(f=>f.group===mapGroupSelection):[];
+    if(focusAssemblyMode&&!items.length){focusAssemblyMode=false;mapGroupSelection='all';}
+    if(focusAssemblyMode){
+      const xs=items.map(f=>f.map.x),ys=items.map(f=>f.map.y),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+      // Proportional zoom maintains the relative spacing of an assembly.
+      mapFocusZoom={x:(minX+maxX)/2,y:(minY+maxY)/2,scale:Math.min(3.9,76/Math.max(15,maxX-minX),62/Math.max(12,maxY-minY))};
+      $('mapFocusName').textContent=mapGroupSelection;
+    }else mapFocusZoom={x:50,y:50,scale:1};
+    field.classList.toggle('focused',focusAssemblyMode);
+    focus.setAttribute('aria-pressed',String(focusAssemblyMode));
+    focus.textContent=focusAssemblyMode?'Exit focus':'Focus assembly';
+  }
   function renderMapInfo(){
     const root=$('mapInfo');root.replaceChildren();const f=data.fixtures.find(x=>x.id===selectedFixtureId);
     if(!f){root.append(txt('div','map-title','Select a fixture'),txt('div','map-muted','Click a marker on the vehicle to see its assigned timeline channel. Drag a marker to reposition it.'));return;}
     const i=data.fixtures.indexOf(f),c=data.channels[indexOfChannel(f.channelId)];
     root.append(txt('div','map-name',f.label),txt('div','map-muted',`${f.group} · ${f.zone} · ${f.type.replaceAll('_',' ')}`),txt('div','map-link',`Channel: ${c?.label||'unmapped'} · ${fixtureForChannel(f.channelId).length} linked light(s)`),txt('div','map-muted',`Diagram: X ${f.map.x.toFixed(1)}% · Y ${f.map.y.toFixed(1)}%`));
+    if(focusAssemblyMode)root.append(txt('div','map-drag-status',`Focused on ${mapGroupSelection} · zoomed for editing`));
     if(moveAssemblyMode)root.append(txt('div','map-drag-status',`Assembly move on · ${data.fixtures.filter(x=>x.group===f.group).length} fixtures in “${f.group}”`));
     const acts=txt('div','btn-group');const timeline=txt('button','btn btn-strong','Find timeline row'),edit=txt('button','btn btn-quiet','Edit fixture');
     timeline.type=edit.type='button';timeline.id='mapFindTimeline';edit.id='mapEditFixture';acts.append(timeline,edit);root.append(acts);
@@ -807,12 +950,13 @@
     filter.replaceChildren();const all=txt('option','','All assemblies');all.value='all';filter.append(all);
     groups.forEach(group=>{const opt=txt('option','',group);opt.value=group;filter.append(opt);});
     mapGroupSelection=groups.includes(old)?old:'all';filter.value=mapGroupSelection;
+    updateMapFocus();
     const root=$('mapMarkers');root.replaceChildren();mapPreviews=[];
     let count=0;
     data.fixtures.forEach((f,i)=>{
       if(mapGroupSelection!=='all'&&f.group!==mapGroupSelection)return;
       const marker=txt('button','map-marker',String(i+1).padStart(2,'0'));marker.type='button';marker.dataset.mapFixture=i;marker.dataset.fixtureId=f.id;
-      marker.style.left=f.map.x+'%';marker.style.top=f.map.y+'%';
+      const pos=mapViewPosition(f.map);marker.style.left=pos.x+'%';marker.style.top=pos.y+'%';
       const channel=data.channels[indexOfChannel(f.channelId)];
       marker.dataset.tooltip=`${f.label}\n${channel?.label||'Unmapped channel'}`;
       marker.title=`${f.label}\nChannel: ${channel?.label||'?'}\nDouble-click to edit · Drag to reposition`;
@@ -843,10 +987,10 @@
     const mismatched=orderIds.length!==trafficFixtures(trafficGroupSelection).length;
     $('taStatus').textContent=`${trafficGroupSelection}: ${orderIds.length} ordered segments · ${p.stepMs} ms per step · ${p.stepCount} steps · ${trafficModeSelection} program.${mismatched?' New segments detected: regenerate to include them.':''}`;
   }
-  function refresh(){ensureTrafficPrograms();updateMeta();renderMap();renderPreviewRack();renderTimeline();renderSwitches();renderMappings();renderTrafficBuilder();syncSelection();renderPreview();updateHistory();}
-  function setCell(r,t,color){if(r<0||r>=data.channels.length||t<0||t>=data.stepCount)return false;if(stage().rows[r][t]===color)return false;
-    stage().rows[r][t]=color;const cell=$('timeline').querySelector(`.cell[data-r="${r}"][data-t="${t}"]`);if(cell){styleCell(cell,color);cell.title=`${data.channels[r].label} · ${t*data.stepMs} ms · ${colorName(color)}`;cell.setAttribute('aria-label',`${data.channels[r].label}, step ${t+1}: ${colorName(color)}`);}renderPreview();save();return true;}
-  $('timeline').addEventListener('pointerdown',e=>{if(e.button!==0&&e.button!==2)return;const cell=e.target.closest('.cell');if(!cell)return;e.preventDefault();drag=true;dragTouched=false;const r=Number(cell.dataset.r),t=Number(cell.dataset.t);const f=fixtureForChannel(data.channels[r].id)[0];if(f){selectedFixtureId=f.id;syncSelection();} dragColor=(e.button===2||brush===null||stage().rows[r][t]===brush)?null:brush;history();dragTouched=setCell(r,t,dragColor);});
+  function refresh(){ensureTrafficPrograms();updateMeta();renderMap();renderTimeline();renderSwitches();renderMappings();renderTrafficBuilder();syncSelection();renderPreview();updateHistory();}
+  function setCell(r,t,color){if(r<0||r>=data.channels.length||t<0||t>=channelStepCount(data.channels[r]))return false;const row=channelRows(r);if(row[t]===color)return false;
+    row[t]=color;const cell=$('timeline').querySelector(`.cell[data-r="${r}"][data-t="${t}"]`);if(cell){styleCell(cell,color);cell.title=`${data.channels[r].label} · ${t*channelStepMs(data.channels[r])} ms · ${colorName(color)}`;cell.setAttribute('aria-label',`${data.channels[r].label}, step ${t+1}: ${colorName(color)}`);}renderPreview();save();return true;}
+  $('timeline').addEventListener('pointerdown',e=>{if(e.button!==0&&e.button!==2)return;const cell=e.target.closest('.cell');if(!cell)return;e.preventDefault();drag=true;dragTouched=false;const r=Number(cell.dataset.r),t=Number(cell.dataset.t);const f=fixtureForChannel(data.channels[r].id)[0];if(f){selectedFixtureId=f.id;syncSelection();} dragColor=(e.button===2||brush===null||channelRows(r)[t]===brush)?null:brush;history();dragTouched=setCell(r,t,dragColor);});
   document.addEventListener('pointermove',e=>{if(!drag)return;const cell=document.elementFromPoint(e.clientX,e.clientY)?.closest('.cell');if(cell&&$('timeline').contains(cell))dragTouched=setCell(Number(cell.dataset.r),Number(cell.dataset.t),dragColor)||dragTouched;});
   document.addEventListener('pointerup',()=>{drag=false;});window.addEventListener('blur',()=>{drag=false;});$('timeline').addEventListener('contextmenu',e=>{if(e.target.closest('.cell'))e.preventDefault();});
   function selectBrush(color,button){brush=color;document.querySelectorAll('.brush').forEach(b=>b.classList.toggle('active',b===button));$('editorStatus').textContent=color?'Brush: '+colorName(color):'Brush: erase';}
@@ -857,28 +1001,39 @@
   $('stepCount').addEventListener('change',e=>{const n=Number(e.target.value);if(!COUNT_CHOICES.includes(n))return;history();data.stages.forEach(s=>s.rows.forEach(row=>{if(n>row.length)row.push(...Array(n-row.length).fill(null));else row.length=n;}));data.stepCount=n;data.fixtures.forEach(f=>f.phase%=n);resetClock();refresh();save();});
   $('brightness').addEventListener('input',e=>$('brightnessDisplay').textContent=e.target.value+'%');$('brightness').addEventListener('change',e=>{history();stage().brightness=Number(e.target.value)/100;renderPreview();save();});
   $('patternName').addEventListener('change',e=>{history();data.name=clean(e.target.value,64,'Untitled Pattern');e.target.value=data.name;save();});
-  $('playBtn').addEventListener('click',()=>{if(playing)elapsedWhenPaused=Math.max(0,performance.now()-clock);playing=!playing;if(playing)clock=performance.now()-elapsedWhenPaused;$('playBtn').textContent=playing?'Pause':'Play';$('playState').textContent=playing?'Playing':'Paused';});
+  $('playBtn').addEventListener('click',()=>{if(playing)elapsedWhenPaused=Math.max(0,performance.now()-clock);playing=!playing;if(playing)clock=performance.now()-elapsedWhenPaused;$('playBtn').textContent=playing?'Pause':'Play';$('playState').textContent=playing?'Playing':'Paused';renderPreview();updateIndependentHeads();});
   document.addEventListener('keydown',e=>{if(e.target.closest('input,select,textarea,dialog'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();restore(undo,redo);}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();restore(redo,undo);}else if(e.code==='Space'&&!e.repeat&&!e.target.closest('button')){e.preventDefault();$('playBtn').click();}});
   $('undoBtn').addEventListener('click',()=>restore(undo,redo));$('redoBtn').addEventListener('click',()=>restore(redo,undo));
   ['channelSearch','zoneFilter','showOnlyProgrammed'].forEach(id=>$(id).addEventListener(id==='channelSearch'?'input':'change',refresh));
   $('clearFilters').addEventListener('click',()=>{$('channelSearch').value='';$('zoneFilter').value='all';$('showOnlyProgrammed').checked=false;refresh();});
-  $('previewLayout').addEventListener('change',e=>{previewLayout=e.target.value;renderPreviewRack();});$('expandAllBtn').addEventListener('click',()=>{collapsed.clear();renderTimeline();});
+  $('expandAllBtn').addEventListener('click',()=>{collapsed.clear();renderTimeline();});
   $('timeline').addEventListener('click',e=>{let target=e.target.closest('[data-collapse]');if(target){const k=target.dataset.collapse;collapsed.has(k)?collapsed.delete(k):collapsed.add(k);renderTimeline();return;}
-    target=e.target.closest('[data-find-channel]');if(target){const f=data.fixtures.find(x=>x.channelId===target.dataset.findChannel);if(f){const i=data.fixtures.indexOf(f);mapGroupSelection='all';renderMap();focusFixture(i,'map');}else toast('This channel has no physical fixtures assigned.');return;}
+    target=e.target.closest('[data-find-channel]');if(target){const f=data.fixtures.find(x=>x.channelId===target.dataset.findChannel);if(f){const i=data.fixtures.indexOf(f);focusAssemblyMode=false;mapGroupSelection='all';renderMap();focusFixture(i,'map');}else toast('This channel has no physical fixtures assigned.');return;}
     target=e.target.closest('[data-edit-channel]');if(target){openChannelDialog(Number(target.dataset.editChannel));return;}
-    target=e.target.closest('[data-clear]');if(target){const i=Number(target.dataset.clear);if(stage().rows[i].some(Boolean)){history();stage().rows[i].fill(null);refresh();save();toast('Channel cleared in current stage');}return;}
-    target=e.target.closest('[data-duplicate]');if(target){if(data.channels.length>=MAX_CHANNELS){toast('Maximum 128 channels');return;}const i=Number(target.dataset.duplicate),c=data.channels[i];history();createChannel(c.label+' copy',c.group,i+1,data.stages.map(s=>s.rows[i]));refresh();save();toast('Pattern channel duplicated (no physical fixture)');return;}
+    target=e.target.closest('[data-clear]');if(target){const i=Number(target.dataset.clear);if(channelRows(i).some(Boolean)){history();channelRows(i).fill(null);refresh();save();toast('Channel cleared in current stage');}return;}
+    target=e.target.closest('[data-duplicate]');if(target){if(data.channels.length>=MAX_CHANNELS){toast('Maximum 128 channels');return;}const i=Number(target.dataset.duplicate),c=data.channels[i];history();const dup=createChannel(c.label+' copy',c.group,i+1,data.stages.map(s=>s.rows[i]));dup.timing=deep(c.timing);dup.localRows=deep(c.localRows);refresh();save();toast('Pattern channel duplicated (no physical fixture)');return;}
     target=e.target.closest('[data-remove]');if(target){const i=Number(target.dataset.remove),c=data.channels[i],n=fixtureForChannel(c.id).length;if(n){toast(`Reassign or delete ${n} fixture(s) before deleting this channel`);return;}if(!confirm(`Delete channel "${c.label}" and its stage sequences?`))return;history();data.channels.splice(i,1);data.stages.forEach(s=>s.rows.splice(i,1));refresh();save();toast('Pattern channel deleted');}
   });
   document.querySelectorAll('[data-preset]').forEach(btn=>btn.addEventListener('click',()=>{const mode=btn.dataset.preset,visibleOnly=$('presetVisibleOnly').checked;let indices=visibleOnly?visibleChannels().map(x=>x.i):data.channels.map((c,i)=>mode==='clear'||!fixtureForChannel(c.id).length||fixtureForChannel(c.id).some(f=>f.circuit==='warning')?i:-1).filter(i=>i>=0);
     if(!indices.length){toast('No matching channels');return;}if(mode==='clear'&&!confirm('Clear selected stage patterns'+(visibleOnly?' for visible channels':' for all channels')+'?'))return;
-    history();indices.forEach((r,i)=>{const c=data.channels[r];for(let t=0;t<data.stepCount;t++){let on=false;if(mode==='alternate')on=(t%8<4)===(i%2===0);if(mode==='double')on=(t%8===0||t%8===2)===(i%2===0);if(mode==='sweep')on=t%Math.min(8,data.stepCount)===i%Math.min(8,data.stepCount);if(mode==='steady')on=true;stage().rows[r][t]=on?suggestColor(c,i):null;}});refresh();save();toast(`${btn.textContent} applied to ${indices.length} channels`);
+    history();indices.forEach((r,i)=>{const c=data.channels[r],row=channelRows(r);for(let t=0;t<row.length;t++){let on=false;if(mode==='alternate')on=(t%8<4)===(i%2===0);if(mode==='double')on=(t%8===0||t%8===2)===(i%2===0);if(mode==='sweep')on=t%Math.min(8,row.length)===i%Math.min(8,row.length);if(mode==='steady')on=true;row[t]=on?suggestColor(c,i):null;}});refresh();save();toast(`${btn.textContent} applied to ${indices.length} channels`);
   }));
   TEMPLATES.forEach(t=>{const opt=txt('option','',t.label);opt.value=t.key;$('assemblySelect').append(opt);});
   $('addAssemblyBtn').addEventListener('click',()=>{const template=TEMPLATES.find(t=>t.key===$('assemblySelect').value);if(!template)return;if(data.channels.length+template.names.length>MAX_CHANNELS||data.fixtures.length+template.names.length>MAX_FIXTURES){toast('Not enough room for this assembly');return;}history();addAssembly(template);refresh();save();toast(`Added ${template.names.length} mapped fixtures and channels`);});
   $('demoBtn').addEventListener('click',()=>{if(!confirm('Replace the project with a full-vehicle example? Export a backup first.'))return;history();newDemo();manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();toast('Full vehicle example loaded');});
-  $('copyStageBtn').addEventListener('click',()=>{const from=Number($('copySource').value);if(from===activeStage){toast('Choose another stage');return;}if(!confirm(`Overwrite stage ${activeStage} with stage ${from} patterns?`))return;history();stage().rows=deep(data.stages[from-1].rows);refresh();save();toast(`Copied stage ${from} to stage ${activeStage}`);});
-  $('mapGroupFilter').addEventListener('change',e=>{mapGroupSelection=e.target.value;renderMap();syncSelection();renderPreview();});
+  $('copyStageBtn').addEventListener('click',()=>{const from=Number($('copySource').value);if(from===activeStage){toast('Choose another stage');return;}if(!confirm(`Overwrite stage ${activeStage} with stage ${from} patterns?`))return;history();stage().rows=deep(data.stages[from-1].rows);data.channels.forEach(c=>{if(clockIsIndependent(c))c.localRows[activeStage-1]=deep(c.localRows[from-1]);});refresh();save();toast(`Copied stage ${from} to stage ${activeStage}`);});
+  $('mapGroupFilter').addEventListener('change',e=>{mapGroupSelection=e.target.value;if(focusAssemblyMode&&mapGroupSelection==='all')focusAssemblyMode=false;renderMap();syncSelection();renderPreview();});
+  $('mapFocusBtn').addEventListener('click',()=>{
+    if(focusAssemblyMode){focusAssemblyMode=false;mapGroupSelection=oldMapGroup;}
+    else{
+      if(!data.fixtures.length){toast('Add a fixture to use assembly focus');return;}
+      oldMapGroup=mapGroupSelection;
+      const selected=data.fixtures.find(f=>f.id===selectedFixtureId);
+      mapGroupSelection=mapGroupSelection!=='all'?mapGroupSelection:selected?.group||data.fixtures[0].group;
+      focusAssemblyMode=true;
+    }
+    renderMap();syncSelection();renderPreview();
+  });
   $('mapMoveAssembly').addEventListener('click',()=>{
     moveAssemblyMode=!moveAssemblyMode;
     const button=$('mapMoveAssembly');button.classList.toggle('map-mode-active',moveAssemblyMode);
@@ -899,7 +1054,7 @@
     else if(e.target.id==='mapEditFixture'){const i=data.fixtures.findIndex(f=>f.id===selectedFixtureId);if(i>=0)openFixtureDialog(i);}
   });
   function planMapDrag(d,clientX,clientY){
-    const dx=(clientX-d.startX)/d.rect.width*100,dy=(clientY-d.startY)/d.rect.height*100;
+    const dx=(clientX-d.startX)/d.rect.width*100/(focusAssemblyMode?mapFocusZoom.scale:1),dy=(clientY-d.startY)/d.rect.height*100/(focusAssemblyMode?mapFocusZoom.scale:1);
     const origin=data.fixtures[d.index];
     const snap=snapMapPosition(origin,d.x+dx,d.y+dy);
     let shiftX=snap.x-d.x,shiftY=snap.y-d.y;
@@ -924,7 +1079,7 @@
     d.positions=planMapDrag(d,e.clientX,e.clientY);
     d.positions.forEach(p=>{
       const marker=[...$('mapMarkers').children].find(node=>node.dataset.fixtureId===p.id);
-      if(marker){marker.style.left=p.x+'%';marker.style.top=p.y+'%';marker.classList.add(p.id===data.fixtures[d.index].id?'dragging':'assembly-peer');}
+      if(marker){const vis=mapViewPosition(p);marker.style.left=vis.x+'%';marker.style.top=vis.y+'%';marker.classList.add(p.id===data.fixtures[d.index].id?'dragging':'assembly-peer');}
     });
   });
   const releaseMap=e=>{
@@ -940,12 +1095,28 @@
   $('mapMarkers').addEventListener('dblclick',e=>{const b=e.target.closest('[data-map-fixture]');if(b)openFixtureDialog(Number(b.dataset.mapFixture));});
   $('mapMarkers').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-map-fixture]'))focusFixture(Number(e.target.dataset.mapFixture),'timeline');});
 
-  $('previewRack').addEventListener('click',e=>{const t=e.target.closest('[data-fixture]');if(t)focusFixture(Number(t.dataset.fixture),'timeline');});
-  $('previewRack').addEventListener('dblclick',e=>{const t=e.target.closest('[data-fixture]');if(t)openFixtureDialog(Number(t.dataset.fixture));});
   $('functionSwitches').addEventListener('click',e=>{const b=e.target.closest('[data-manual]');if(!b)return;manual.has(b.dataset.manual)?manual.delete(b.dataset.manual):manual.add(b.dataset.manual);renderSwitches();renderPreview();});
   $('functionSwitches').addEventListener('change',e=>{if(e.target.id==='trafficDirection'){history();data.trafficDirection=e.target.value;trafficModeSelection=e.target.value;renderTrafficBuilder();renderPreview();save();}});
   TYPES.forEach(([id,label])=>{const opt=txt('option','',label);opt.value=id;$('channelType').append(opt);});CIRCUITS.forEach(([id,label])=>{const opt=txt('option','',label);opt.value=id;$('channelCircuit').append(opt);});
-  function openChannelDialog(i=null){editChannel=i;const c=i===null?{label:`Channel ${String(data.channels.length+1).padStart(2,'0')}`,group:'Custom'}:data.channels[i];$('patternDialogTitle').textContent=i===null?'Add pattern channel':'Edit pattern channel';$('savePattern').textContent=i===null?'Add channel':'Save channel';$('patternChannelName').value=c.label;$('patternChannelGroup').value=c.group;$('patternDialog').showModal();$('patternChannelName').focus();}
+  function updateChannelClockFields(){
+    const ind=$('patternClockMode').value==='independent';
+    $('timingFields').classList.toggle('is-disabled',!ind);
+    $('patternClockHelp').textContent=ind?`This channel loops independently, with its own ${$('patternLocalSteps').value} steps × ${$('patternLocalMs').value} ms. Other channels keep playing unaffected.`:'Uses the master clock and main timeline.';
+  }
+  $('patternClockMode').addEventListener('change',updateChannelClockFields);
+  $('patternLocalMs').addEventListener('change',updateChannelClockFields);
+  $('patternLocalSteps').addEventListener('change',updateChannelClockFields);
+  function openChannelDialog(i=null){
+    editChannel=i;const c=i===null?{label:`Channel ${String(data.channels.length+1).padStart(2,'0')}`,group:'Custom'}:data.channels[i];
+    $('patternDialogTitle').textContent=i===null?'Add pattern channel':'Edit pattern channel';
+    $('savePattern').textContent=i===null?'Add channel':'Save channel';
+    $('patternChannelName').value=c.label;$('patternChannelGroup').value=c.group;
+    $('patternClockMode').value=clockIsIndependent(c)?'independent':'master';
+    $('patternLocalMs').value=String(clockIsIndependent(c)?c.timing.stepMs:data.stepMs);
+    $('patternLocalSteps').value=String(clockIsIndependent(c)?c.timing.stepCount:data.stepCount);
+    $('patternOffsetMs').value=String(clockIsIndependent(c)?c.timing.offsetMs:0);
+    updateChannelClockFields();$('patternDialog').showModal();$('patternChannelName').focus();
+  }
   function openFixtureDialog(i=null){if(!data.channels.length){toast('Add a pattern channel first');return;}editFixture=i;const f=i===null?baseFixture({label:`Light ${String(data.fixtures.length+1).padStart(2,'0')}`,group:'Custom',channelId:data.channels[0].id}):data.fixtures[i];$('dialogTitle').textContent=i===null?'Add physical fixture':'Edit physical fixture';$('submitChannel').textContent=i===null?'Add fixture':'Save fixture';
     $('taOrderField').style.display=f.circuit==='traffic'?'block':'none';$('fixtureTaOrder').value=String(f.taOrder||ordinalFromName(f)||1);$('channelName').value=f.label;$('channelGroup').value=f.group;$('channelType').value=f.type;$('channelZone').value=f.zone;$('channelCircuit').value=f.circuit;$('channelColorProfile').value=f.colorProfile;$('channelCustomColor').value=f.customColor;
     $('customColorRow').style.display=f.colorProfile==='custom'?'block':'none';$('channelBrightness').value=String(Math.round(f.brightness*100));$('channelBrightnessValue').textContent=Math.round(f.brightness*100)+'%';$('channelPhase').max=String(data.stepCount-1);$('channelPhase').value=String(f.phase%data.stepCount);
@@ -953,7 +1124,32 @@
     ['X','Y','Z'].forEach((a,j)=>$('mount'+a).value=String(f.mount.position[j]));['Pitch','Yaw','Roll'].forEach((a,j)=>$('mount'+a).value=String(f.mount.rotation[j]));$('fixtureDialog').showModal();$('channelName').focus();}
   $('addChannelBtn').addEventListener('click',()=>openChannelDialog());$('mapNewChannel').addEventListener('click',()=>openChannelDialog());$('addFixtureBtn').addEventListener('click',()=>openFixtureDialog());$('mapNewFixture').addEventListener('click',()=>openFixtureDialog());
   $('cancelPattern').addEventListener('click',()=>$('patternDialog').close());$('cancelDialog').addEventListener('click',()=>$('fixtureDialog').close());
-  $('patternForm').addEventListener('submit',e=>{e.preventDefault();const label=clean($('patternChannelName').value,60),group=clean($('patternChannelGroup').value,36);if(!label||!group){toast('Enter both values');return;}if(editChannel===null&&data.channels.length>=MAX_CHANNELS){toast('Maximum 128 channels');return;}history();if(editChannel===null)createChannel(label,group);else Object.assign(data.channels[editChannel],{label,group});$('patternDialog').close();refresh();save();toast(editChannel===null?'Pattern channel added':'Channel updated; stable ID unchanged');});
+  $('patternForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const label=clean($('patternChannelName').value,60),group=clean($('patternChannelGroup').value,36);
+    if(!label||!group){toast('Enter both values');return;}
+    if(editChannel===null&&data.channels.length>=MAX_CHANNELS){toast('Maximum 128 channels');return;}
+    const ind=$('patternClockMode').value==='independent';
+    const ms=Number($('patternLocalMs').value),steps=Number($('patternLocalSteps').value);
+    const phase=Number($('patternOffsetMs').value);
+    if(ind&&(!STEP_CHOICES.includes(ms)||!COUNT_CHOICES.includes(steps)||!Number.isInteger(phase)||Math.abs(phase)>10000)){toast('Invalid independent timing');return;}
+    history();const i=editChannel===null?data.channels.length:editChannel;
+    const c=editChannel===null?createChannel(label,group):data.channels[i];
+    c.label=label;c.group=group;
+    if(ind){
+      if(!clockIsIndependent(c)||!Array.isArray(c.localRows)){
+        c.localRows=data.stages.map(s=>remapCells(s.rows[i],data.stepMs,steps,ms));
+      }else if(c.timing.stepMs!==ms||c.timing.stepCount!==steps){
+        c.localRows=c.localRows.map(row=>remapCells(row,c.timing.stepMs,steps,ms));
+      }
+      c.timing={mode:'independent',stepMs:ms,stepCount:steps,offsetMs:phase};
+    }else if(clockIsIndependent(c)){
+      data.stages.forEach((s,si)=>s.rows[i]=remapCells(c.localRows[si],c.timing.stepMs,data.stepCount,data.stepMs));
+      c.timing={mode:'master',stepMs:data.stepMs,stepCount:data.stepCount,offsetMs:0};c.localRows=null;
+    }
+    $('patternDialog').close();resetClock();refresh();save();
+    toast(ind?'Channel has its own independent timeline':editChannel===null?'Pattern channel added':'Channel updated');
+  });
   $('channelColorProfile').addEventListener('change',e=>$('customColorRow').style.display=e.target.value==='custom'?'block':'none');$('channelBrightness').addEventListener('input',e=>$('channelBrightnessValue').textContent=e.target.value+'%');
   $('channelType').addEventListener('change',e=>{const map={alley:['alley_left','white','Left'],takedown:['takedown','white','Front'],traffic:['traffic','amber','Rear'],scene:['scene','white','Rear'],rear_aux:['warning','redblue','Rear'],grille:['warning','redblue','Front'],underbar:['warning','redbluewhite','Front'],lightbar:['warning','redblue','Roof'],window:['warning','redblue','Interior'],mirror:['warning','redblue','Left'],bumper:['warning','redblue','Front'],running:['warning','redblue','Left']};const v=map[e.target.value];if(!v)return;$('taOrderField').style.display=e.target.value==='traffic'?'block':'none';[$('channelCircuit').value,$('channelColorProfile').value,$('channelZone').value]=v;$('customColorRow').style.display='none';});
   $('channelCircuit').addEventListener('change',e=>{$('taOrderField').style.display=e.target.value==='traffic'?'block':'none';});
@@ -997,10 +1193,21 @@
     manual.add('traffic');renderTrafficBuilder();renderSwitches();renderPreview();save();
   });
   const json=()=>JSON.stringify(data,null,2);
-  $('exportBtn').addEventListener('click',()=>{const name=data.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pattern',url=URL.createObjectURL(new Blob([json()],{type:'application/json'})),a=txt('a');a.href=url;a.download=name+'.els.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('Exported v4 pattern, 2D layout and traffic sequences');});
+  $('exportBtn').addEventListener('click',()=>{const name=data.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pattern',url=URL.createObjectURL(new Blob([json()],{type:'application/json'})),a=txt('a');a.href=url;a.download=name+'.els.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('Exported v5 pattern with independent channel clocks');});
   $('copyBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(json());toast('JSON copied');}catch{toast('Clipboard unavailable. Use Export pattern.');}});
-  $('importFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('File exceeds 5 MB');const imported=validate(JSON.parse(await file.text()));if(!confirm('Replace your current project with the imported file? Export a backup first.'))return;history();data=imported;manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();toast('Imported project · upgraded to schema v4');}catch(err){toast('Import failed: '+err.message);}finally{e.target.value='';}});
-  function tick(time){if(playing){const elapsed=Math.max(0,time-clock),next=Math.floor(elapsed/data.stepMs)%data.stepCount;const ta=trafficConfig(trafficGroupSelection),taStep=ta&&manual.has('traffic')?Math.floor(elapsed/ta.stepMs)%ta.stepCount:-1;if(head!==next||lastTATick!==taStep){head=next;lastTATick=taStep;renderPreview();updateHead();}}requestAnimationFrame(tick);}
+  $('importFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('File exceeds 5 MB');const imported=validate(JSON.parse(await file.text()));if(!confirm('Replace your current project with the imported file? Export a backup first.'))return;history();data=imported;manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();toast('Imported project · upgraded to schema v5');}catch(err){toast('Import failed: '+err.message);}finally{e.target.value='';}});
+  let lastIndependentTicks='';
+  function tick(time){
+    if(playing){
+      const elapsed=Math.max(0,time-clock),next=Math.floor(elapsed/data.stepMs)%data.stepCount;
+      const ta=trafficConfig(trafficGroupSelection),taStep=ta&&manual.has('traffic')?Math.floor(elapsed/ta.stepMs)%ta.stepCount:-1;
+      const clocks=data.channels.filter(clockIsIndependent).map(c=>channelStepAt(c,elapsed)).join(',');
+      if(head!==next||lastTATick!==taStep||lastIndependentTicks!==clocks){
+        head=next;lastTATick=taStep;lastIndependentTicks=clocks;renderPreview();updateHead();updateIndependentHeads();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
   refresh();save();requestAnimationFrame(tick);
 })();
 </script>
