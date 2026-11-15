@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#111419">
   <meta name="description" content="A visual emergency lighting pattern sequencer for S&box.">
-  <title>ELS Studio v0.5 | Vehicle Mapper & Traffic Advisor</title>
+  <title>ELS Studio v0.5.1 | Vehicle Mapper & Traffic Advisor</title>
   <style>
     :root {
       --bg: #0f1216; --surface: #161a1f; --surface-2: #1c2229; --surface-3: #262d35;
@@ -235,6 +235,15 @@
     .map-marker.selected{outline:2px solid #c6eef5;outline-offset:2px;background:#5a7e8a;color:#fff;z-index:7}
     .map-marker.on {background:var(--light);border-color:var(--light);color:#061722;box-shadow:0 0 8px var(--light),0 0 16px color-mix(in srgb,var(--light) 46%,transparent);}
     .map-marker.dragging{cursor:grabbing;z-index:10;transition:none}
+    .map-marker.assembly-peer {outline:2px dashed #b9d5de;outline-offset:2px;z-index:6}
+    .map-marker::after {content:attr(data-tooltip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);min-width:max-content;max-width:275px;white-space:pre-line;text-align:left;background:#0b1218;border:1px solid #75919e;border-radius:6px;padding:7px 10px;color:#f3f8fa;box-shadow:0 8px 22px #000b;font:600 11px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .1s;z-index:25}
+    .map-marker:hover::after,.map-marker:focus-visible::after{opacity:1;visibility:visible}
+    .map-marker.dragging::after{opacity:0;visibility:hidden}
+    .map-controls .map-mode-active {border-color:#a3cbd4;background:#304955;color:#eaf9fc}
+    .map-controls label {font-size:11px;color:#90a3b2}
+    .map-controls #mapSnapMode {min-width:124px}
+    .map-drag-status {color:#a7c6d2;font-size:11px;font-weight:600}
+    @media (hover:none) {.map-marker::after {display:none}}
     .map-controls {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .map-controls select{height:31px;width:auto;max-width:220px;font-size:11px}
     .map-sidebar{display:flex;flex-direction:column;gap:13px;min-width:0}
@@ -350,7 +359,7 @@
       </div>
 
       <section class="panel" id="vehicleMapSection" aria-label="Visual vehicle fixture mapper">
-        <div class="panel-header"><div><div class="panel-heading">Visual vehicle mapper</div><div class="hint">Place fixtures visually, select a light to find its timeline channel. Drag markers to adjust their diagram position.</div></div><div class="map-controls"><label for="mapGroupFilter" class="hint">Show</label><select id="mapGroupFilter" aria-label="Map assembly filter"><option value="all">All assemblies</option></select><button class="btn btn-quiet" id="autoPlaceMap" type="button">Auto arrange</button></div></div>
+        <div class="panel-header"><div><div class="panel-heading">Visual vehicle mapper</div><div class="hint">Select or drag a fixture. Hover for its name, switch on assembly move to reposition linked equipment.</div></div><div class="map-controls"><label for="mapGroupFilter">Show</label><select id="mapGroupFilter" aria-label="Map assembly filter"><option value="all">All assemblies</option></select><label for="mapSnapMode">Snap</label><select id="mapSnapMode" aria-label="Map placement snap mode"><option value="guide">Mount guides</option><option value="free">Free placement</option></select><button class="btn btn-quiet" id="mapMoveAssembly" aria-pressed="false" title="Move every fixture in the same assembly together" type="button">Move assembly: Off</button><button class="btn btn-quiet" id="autoPlaceMap" type="button" title="Reset the shown fixtures to their recommended vehicle positions">Auto arrange</button></div></div>
         <div class="map-layout">
           <div class="map-board">
             <div class="map-field" id="mapField" aria-label="Top down vehicle schematic with draggable fixture markers">
@@ -372,7 +381,7 @@
           </div>
           <div class="map-sidebar">
             <div class="map-info" id="mapInfo" aria-live="polite"><div class="map-title">Select a fixture</div><div class="map-muted">Click a numbered marker to see its name, assigned channel, and location. Connected fixtures highlight together.</div></div>
-            <div class="map-hint">Drag to place a light on this schematic. Positions are saved with the project, but <strong>do not change</strong> the S&box 3D mount offsets.<div style="margin-top:7px">Tip: double-click a marker to edit its fixture and mount properties.</div></div>
+            <div class="map-hint"><strong>Snap: Mount guides</strong> keeps grille, roof, window, and side fixtures aligned as you drag. Select <strong>Free placement</strong> for precise positioning.<div style="margin-top:7px"><strong>Move assembly</strong> moves every fixture sharing a group name, including hidden fixtures. <strong>Auto arrange</strong> resets the visible group to recommended positions.</div><div style="margin-top:7px">Diagram placement is independent of S&box 3D mounting. Double-click a fixture to edit its details.</div></div>
             <div class="map-legend">Each number represents one physical fixture. Matching channel assignments highlight together. Use <strong>Show</strong> to isolate an assembly when the vehicle has lots of lights.<div class="map-filter-note" id="mapCount">0 fixtures shown</div></div>
           </div>
         </div>
@@ -551,7 +560,7 @@
   const baseFixture=(c={})=>({id:clean(c.id,100),label:clean(c.label,60,'Unnamed fixture'),group:clean(c.group,36,'Custom'),type:TYPES.some(t=>t[0]===c.type)?c.type:'other',zone:ZONES.includes(c.zone)?c.zone:'Other',circuit:CIRCUITS.some(t=>t[0]===c.circuit)?c.circuit:'warning',colorProfile:Object.hasOwn(PROFILES,c.colorProfile)||c.colorProfile==='custom'?c.colorProfile:'any',customColor:isHex(c.customColor)?c.customColor.toLowerCase():'#bc8cff',brightness:clamp(c.brightness,.05,1,1),phase:Math.round(clamp(c.phase,0,63,0)),colorMode:c.colorMode==='fixed'?'fixed':'timeline',channelId:clean(c.channelId,100),asset:clean(c.asset,240),taOrder:Math.round(clamp(c.taOrder,0,256,0)),map:c.map&&Number.isFinite(Number(c.map.x))&&Number.isFinite(Number(c.map.y))?{x:Math.round(clamp(c.map.x,3,97,50)*10)/10,y:Math.round(clamp(c.map.y,4,96,50)*10)/10}:null,mount:{anchor:'vehicle',socket:clean(c.mount?.socket,100),position:[0,1,2].map(i=>clamp(c.mount?.position?.[i],-100000,100000,0)),rotation:[0,1,2].map(i=>clamp(c.mount?.rotation?.[i],-360000,360000,0))}});
   let data=newProject(),activeStage=3,brush=COLORS.red,playing=true,head=0,clock=performance.now(),prevHead=-1,drag=false,dragTouched=false,dragColor=null,editFixture=null,editChannel=null,previewLayout='zone';
   let previews=[],mapPreviews=[],collapsed=new Set(),manual=new Set(),undo=[],redo=[],toastTimer;
-  let selectedFixtureId=null,mapGroupSelection='all',trafficGroupSelection='',trafficModeSelection='right',mapDrag=null;
+  let selectedFixtureId=null,mapGroupSelection='all',trafficGroupSelection='',trafficModeSelection='right',mapDrag=null,moveAssemblyMode=false;
   let elapsedWhenPaused=0,lastTATick=-1;
   const stage=()=>data.stages[activeStage-1];
   const indexOfChannel=id=>data.channels.findIndex(c=>c.id===id);
@@ -566,26 +575,48 @@
   function updateHistory(){$('undoBtn').disabled=!undo.length;$('redoBtn').disabled=!redo.length;}
   function restore(from,to){if(!from.length)return;to.push(JSON.stringify(data));data=validate(JSON.parse(from.pop()));collapsed.clear();resetClock();refresh();save();updateHistory();}
   function resetClock(){head=0;prevHead=-1;lastTATick=-1;elapsedWhenPaused=0;clock=performance.now();}
-  function autoMapSpot(f,ordinal=0,total=1){
-    const g=(f.group||'').toLowerCase(),n=Math.max(1,total),slot=n===1?.5:ordinal/(n-1),spread=(min,max)=>Math.round((min+(max-min)*slot)*10)/10;
-    if(f.circuit==='traffic'||f.type==='traffic')return {x:spread(22,78),y:88};
-    if(/front lightbar/.test(g))return {x:spread(24,76),y:29};
-    if(/rear lightbar/.test(g))return {x:spread(25,75),y:54};
-    if(/underbar/.test(g))return {x:spread(28,72),y:20};
-    if(/grill/.test(g))return {x:spread(33,67),y:12};
-    if(/rear window/.test(g))return {x:spread(29,71),y:65};
-    if(/front window/.test(g))return {x:spread(35,65),y:40};
-    if(/rear aux/.test(g))return {x:spread(30,70),y:80};
-    if(/rear deck/.test(g))return {x:spread(31,69),y:70};
-    if(/takedown/.test(g))return {x:spread(42,58),y:23};
-    if(/rear scene/.test(g))return {x:spread(29,71),y:94};
-    if(f.zone==='Left')return {x:12,y:Math.round((26+ordinal*12)%63+10)};
-    if(f.zone==='Right')return {x:88,y:Math.round((26+ordinal*12)%63+10)};
-    if(f.zone==='Front')return {x:spread(29,71),y:16+Math.floor(ordinal/7)*6};
-    if(f.zone==='Rear')return {x:spread(29,71),y:80+Math.floor(ordinal/7)*4};
-    if(f.zone==='Roof')return {x:spread(27,73),y:30+Math.floor(ordinal/7)*7};
-    return {x:spread(30,70),y:49+Math.floor(ordinal/7)*5};
+  // Recommended 2D mount tracks correspond to the top-down SUV schematic.
+  // Tracks affect only diagram positions, never a physical mount in S&box.
+  function mapMountTrack(f){
+    const g=(f.group||'').toLowerCase(),zone=f.zone;
+    const horizontal=(y,min,max)=>({axis:'horizontal',fixed:y,min,max});
+    const vertical=(x,min,max)=>({axis:'vertical',fixed:x,min,max});
+    if(f.circuit==='traffic'||f.type==='traffic'||/traffic advisor/.test(g))return horizontal(84,30,70);
+    if(/rear.*lightbar/.test(g))return horizontal(54,29,71);
+    if(/front.*lightbar/.test(g)||f.type==='lightbar')return horizontal(31,27,73);
+    if(/underbar/.test(g)||f.type==='underbar')return horizontal(21,31,69);
+    if(/grill/.test(g)||f.type==='grille')return horizontal(16,31,69);
+    if(/front.*bumper/.test(g))return horizontal(12.5,36,64);
+    if(/rear.*bumper/.test(g))return horizontal(88,36,64);
+    if(/takedown/.test(g)||f.type==='takedown')return horizontal(26,43,57);
+    if(/rear.*window/.test(g))return horizontal(65,31,69);
+    if(/front.*window/.test(g))return horizontal(39,37,63);
+    if(/rear.*deck/.test(g))return horizontal(73,32,68);
+    if(/rear.*aux/.test(g)||f.type==='rear_aux')return horizontal(76,33,67);
+    if(/rear.*scene/.test(g))return horizontal(92,37,63);
+    if(/mirrors?/.test(g)||f.type==='mirror')return vertical(zone==='Right'?80:20,36,40);
+    if(/alley/.test(g)||f.type==='alley')return vertical(zone==='Right'?75:25,25,32);
+    if(/side.*window/.test(g))return vertical(zone==='Right'?75:25,46,58);
+    if(/running/.test(g)||f.type==='running')return vertical(zone==='Right'?78:22,48,75);
+    if(/side.*scene/.test(g))return vertical(zone==='Right'?78:22,59,70);
+    if(zone==='Left')return vertical(25,29,75);
+    if(zone==='Right')return vertical(75,29,75);
+    if(zone==='Front')return horizontal(17,33,67);
+    if(zone==='Rear')return horizontal(82,33,67);
+    if(zone==='Roof')return horizontal(49,31,69);
+    return horizontal(50,34,66);
   }
+  function autoMapSpot(f,ordinal=0,total=1){
+    const track=mapMountTrack(f),slot=total<2?.5:ordinal/(total-1);
+    const between=(a,b)=>Math.round((a+(b-a)*slot)*10)/10;
+    return track.axis==='horizontal'?{x:between(track.min,track.max),y:track.fixed}:{x:track.fixed,y:between(track.min,track.max)};
+  }
+  function snapMapPosition(f,x,y){
+    if($('mapSnapMode').value==='free')return {x,y};
+    const t=mapMountTrack(f);
+    return t.axis==='horizontal'?{x:clamp(x,t.min,t.max),y:t.fixed}:{x:t.fixed,y:clamp(y,t.min,t.max)};
+  }
+  const mapRounded=v=>Math.round(v*10)/10;
   function positionMissingFixtures(list){
     const groups=grouping(list.map(f=>({f})),x=>x.f.group+'|'+x.f.zone);
     groups.forEach(items=>items.forEach(({f},i)=>{if(!f.map)f.map=autoMapSpot(f,i,items.length);}));
@@ -766,6 +797,7 @@
     if(!f){root.append(txt('div','map-title','Select a fixture'),txt('div','map-muted','Click a marker on the vehicle to see its assigned timeline channel. Drag a marker to reposition it.'));return;}
     const i=data.fixtures.indexOf(f),c=data.channels[indexOfChannel(f.channelId)];
     root.append(txt('div','map-name',f.label),txt('div','map-muted',`${f.group} · ${f.zone} · ${f.type.replaceAll('_',' ')}`),txt('div','map-link',`Channel: ${c?.label||'unmapped'} · ${fixtureForChannel(f.channelId).length} linked light(s)`),txt('div','map-muted',`Diagram: X ${f.map.x.toFixed(1)}% · Y ${f.map.y.toFixed(1)}%`));
+    if(moveAssemblyMode)root.append(txt('div','map-drag-status',`Assembly move on · ${data.fixtures.filter(x=>x.group===f.group).length} fixtures in “${f.group}”`));
     const acts=txt('div','btn-group');const timeline=txt('button','btn btn-strong','Find timeline row'),edit=txt('button','btn btn-quiet','Edit fixture');
     timeline.type=edit.type='button';timeline.id='mapFindTimeline';edit.id='mapEditFixture';acts.append(timeline,edit);root.append(acts);
   }
@@ -781,8 +813,10 @@
       if(mapGroupSelection!=='all'&&f.group!==mapGroupSelection)return;
       const marker=txt('button','map-marker',String(i+1).padStart(2,'0'));marker.type='button';marker.dataset.mapFixture=i;marker.dataset.fixtureId=f.id;
       marker.style.left=f.map.x+'%';marker.style.top=f.map.y+'%';
-      marker.title=`${f.label}\nChannel: ${data.channels[indexOfChannel(f.channelId)]?.label||'?'}\nDouble-click to edit · Drag to reposition`;
-      marker.setAttribute('aria-label',`${f.label}, fixture ${i+1}, move or select`);
+      const channel=data.channels[indexOfChannel(f.channelId)];
+      marker.dataset.tooltip=`${f.label}\n${channel?.label||'Unmapped channel'}`;
+      marker.title=`${f.label}\nChannel: ${channel?.label||'?'}\nDouble-click to edit · Drag to reposition`;
+      marker.setAttribute('aria-label',`${f.label}, fixture ${i+1}, channel ${channel?.label||'unmapped'}, move or select`);
       root.append(marker);mapPreviews[i]=marker;count++;
     });
     $('mapCount').textContent=`${count} / ${data.fixtures.length} fixtures on map`;renderMapInfo();
@@ -845,33 +879,64 @@
   $('demoBtn').addEventListener('click',()=>{if(!confirm('Replace the project with a full-vehicle example? Export a backup first.'))return;history();newDemo();manual.clear();collapsed.clear();activeStage=3;resetClock();refresh();save();toast('Full vehicle example loaded');});
   $('copyStageBtn').addEventListener('click',()=>{const from=Number($('copySource').value);if(from===activeStage){toast('Choose another stage');return;}if(!confirm(`Overwrite stage ${activeStage} with stage ${from} patterns?`))return;history();stage().rows=deep(data.stages[from-1].rows);refresh();save();toast(`Copied stage ${from} to stage ${activeStage}`);});
   $('mapGroupFilter').addEventListener('change',e=>{mapGroupSelection=e.target.value;renderMap();syncSelection();renderPreview();});
-  $('autoPlaceMap').addEventListener('click',()=>{if(!data.fixtures.length)return;const shown=data.fixtures.filter(f=>mapGroupSelection==='all'||f.group===mapGroupSelection);if(!confirm(`Auto-arrange ${shown.length} fixture(s) on the 2D map? This will overwrite their diagram positions, not 3D mounts.`))return;history();const groups=grouping(shown.map(f=>({f})),x=>x.f.group+'|'+x.f.zone);groups.forEach(arr=>arr.forEach(({f},i)=>f.map=autoMapSpot(f,i,arr.length)));renderMap();syncSelection();renderPreview();save();toast('2D diagram positions updated');});
+  $('mapMoveAssembly').addEventListener('click',()=>{
+    moveAssemblyMode=!moveAssemblyMode;
+    const button=$('mapMoveAssembly');button.classList.toggle('map-mode-active',moveAssemblyMode);
+    button.setAttribute('aria-pressed',String(moveAssemblyMode));
+    button.textContent=`Move assembly: ${moveAssemblyMode?'On':'Off'}`;
+    renderMapInfo();
+  });
+  $('autoPlaceMap').addEventListener('click',()=>{
+    if(!data.fixtures.length)return;
+    const shown=data.fixtures.filter(f=>mapGroupSelection==='all'||f.group===mapGroupSelection);
+    if(!confirm(`Reset ${shown.length} fixture(s) to their recommended 2D mounting positions? Your S&box 3D mounts will not change.`))return;
+    history();const groups=grouping(shown.map(f=>({f})),x=>x.f.group+'|'+x.f.zone);
+    groups.forEach(arr=>arr.forEach(({f},i)=>f.map=autoMapSpot(f,i,arr.length)));
+    renderMap();syncSelection();renderPreview();save();toast('Visible fixture placements reset to vehicle guides');
+  });
   $('mapInfo').addEventListener('click',e=>{
     if(e.target.id==='mapFindTimeline'){const i=data.fixtures.findIndex(f=>f.id===selectedFixtureId);focusFixture(i,'timeline');}
     else if(e.target.id==='mapEditFixture'){const i=data.fixtures.findIndex(f=>f.id===selectedFixtureId);if(i>=0)openFixtureDialog(i);}
   });
+  function planMapDrag(d,clientX,clientY){
+    const dx=(clientX-d.startX)/d.rect.width*100,dy=(clientY-d.startY)/d.rect.height*100;
+    const origin=data.fixtures[d.index];
+    const snap=snapMapPosition(origin,d.x+dx,d.y+dy);
+    let shiftX=snap.x-d.x,shiftY=snap.y-d.y;
+    // Clamp the whole assembly as a unit: keep spacing while preventing markers escaping the canvas.
+    shiftX=clamp(shiftX,Math.max(...d.targets.map(p=>3-p.x)),Math.min(...d.targets.map(p=>97-p.x)),0);
+    shiftY=clamp(shiftY,Math.max(...d.targets.map(p=>4-p.y)),Math.min(...d.targets.map(p=>96-p.y)),0);
+    return d.targets.map(p=>({id:p.id,x:mapRounded(p.x+shiftX),y:mapRounded(p.y+shiftY)}));
+  }
   $('mapMarkers').addEventListener('pointerdown',e=>{
     const b=e.target.closest('[data-map-fixture]');if(!b||e.button!==0)return;
     e.preventDefault();const i=Number(b.dataset.mapFixture),f=data.fixtures[i];if(!f)return;
     selectedFixtureId=f.id;syncSelection();const rect=$('mapField').getBoundingClientRect();
-    mapDrag={pointerId:e.pointerId,index:i,button:b,rect,startX:e.clientX,startY:e.clientY,x:f.map.x,y:f.map.y,moved:false};
+    const fixtures=moveAssemblyMode?data.fixtures.filter(item=>item.group===f.group):[f];
+    mapDrag={pointerId:e.pointerId,index:i,button:b,rect,startX:e.clientX,startY:e.clientY,x:f.map.x,y:f.map.y,
+      targets:fixtures.map(item=>({id:item.id,x:item.map.x,y:item.map.y})),moved:false,positions:null};
     b.setPointerCapture(e.pointerId);
   });
   $('mapMarkers').addEventListener('pointermove',e=>{
     const d=mapDrag;if(!d||e.pointerId!==d.pointerId)return;
     if(Math.hypot(e.clientX-d.startX,e.clientY-d.startY)>4)d.moved=true;
     if(!d.moved)return;
-    const x=Math.round(clamp((e.clientX-d.rect.left)/d.rect.width*100,3,97,50)*10)/10;
-    const y=Math.round(clamp((e.clientY-d.rect.top)/d.rect.height*100,4,96,50)*10)/10;
-    d.x=x;d.y=y;d.button.style.left=x+'%';d.button.style.top=y+'%';d.button.classList.add('dragging');
+    d.positions=planMapDrag(d,e.clientX,e.clientY);
+    d.positions.forEach(p=>{
+      const marker=[...$('mapMarkers').children].find(node=>node.dataset.fixtureId===p.id);
+      if(marker){marker.style.left=p.x+'%';marker.style.top=p.y+'%';marker.classList.add(p.id===data.fixtures[d.index].id?'dragging':'assembly-peer');}
+    });
   });
   const releaseMap=e=>{
     const d=mapDrag;if(!d||e.pointerId!==d.pointerId)return;mapDrag=null;
     const f=data.fixtures[d.index];if(!f)return;
-    if(d.moved&&(f.map.x!==d.x||f.map.y!==d.y)){history();f.map={x:d.x,y:d.y};save();renderMap();syncSelection();renderPreview();toast(`${f.label}: diagram position saved`);}
-    else focusFixture(d.index);
+    const updates=d.positions||[];
+    const changed=d.moved&&updates.some(p=>{const found=data.fixtures.find(f=>f.id===p.id);return found&&(found.map.x!==p.x||found.map.y!==p.y);});
+    if(changed){history();updates.forEach(p=>{const target=data.fixtures.find(f=>f.id===p.id);if(target)target.map={x:p.x,y:p.y};});save();renderMap();syncSelection();renderPreview();toast(`${d.targets.length>1?d.targets.length+' assembly fixtures':f.label} repositioned`);}
+    else {renderMap();focusFixture(d.index);renderPreview();}
   };
-  $('mapMarkers').addEventListener('pointerup',releaseMap);$('mapMarkers').addEventListener('pointercancel',e=>{if(mapDrag?.pointerId===e.pointerId){mapDrag=null;renderMap();syncSelection();}});
+  $('mapMarkers').addEventListener('pointerup',releaseMap);
+  $('mapMarkers').addEventListener('pointercancel',e=>{if(mapDrag?.pointerId===e.pointerId){mapDrag=null;renderMap();syncSelection();}});
   $('mapMarkers').addEventListener('dblclick',e=>{const b=e.target.closest('[data-map-fixture]');if(b)openFixtureDialog(Number(b.dataset.mapFixture));});
   $('mapMarkers').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-map-fixture]'))focusFixture(Number(e.target.dataset.mapFixture),'timeline');});
 
